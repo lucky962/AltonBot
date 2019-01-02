@@ -172,7 +172,7 @@ async def on_reaction_add(reaction,user):
                 elif len(formattedtime) == 3:
                     formattedtime = '0' + formattedtime[:1] + ':' + formattedtime[1:]
                 formattedtime = date + ' ' + formattedtime  
-                TrainingTime = datetime.datetime.strptime(formattedtime, '%d/%m/%Y %H%M')
+                TrainingTime = datetime.datetime.strptime(formattedtime, '%d/%m/%Y %H:%M')
             elif ':' in formattedtime:
                 formattedtime = date + ' ' + formattedtime
                 TrainingTime = datetime.datetime.strptime(formattedtime, '%d/%m/%Y %H:%M')
