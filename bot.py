@@ -171,7 +171,7 @@ async def on_reaction_add(reaction,user):
                 TrainingTime = datetime.datetime.strptime(formattedtime, '%d/%m/%Y %H:%M')
             else:
                 await client.send_message(reaction.message.channel, 'Time Format not recognised')
-            currenttime = str(datetime.datetime.now())
+            currenttime = str(datetime.datetime.now() - datetime.timedelta(hours=11))
             currenttime = datetime.datetime.strptime(currenttime, '%Y-%m-%d %H:%M:%S.%f')
             diff = relativedelta(TrainingTime, currenttime)
             try:
