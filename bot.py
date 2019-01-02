@@ -149,7 +149,10 @@ async def on_reaction_add(reaction,user):
                 except:
                     await client.send_message(reaction.message.channel,'Error finding Time')
             print(time)
-            formattedtime = ((re.search('Time: (.*)GMT', reaction.message.content)).group(1)).strip()
+            if 'GMT' in time:
+                formattedtime = ((re.search('Time: (.*)GMT', reaction.message.content)).group(1)).strip()
+            else:
+                formattedtime = ((re.search('Time: (.*)', reaction.message.content)).group(1)).strip()
             print(formattedtime)
             try:
                 date = ((re.search('Date: (.*)\n', reaction.message.content)).group(1)).strip('*')
