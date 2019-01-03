@@ -3,11 +3,21 @@ import discord
 import os
 import re
 import datetime
+import mysql.connector
 from dateutil.relativedelta import relativedelta
 from Dependencies.ServerPrefixes import *
 
 with open('BotToken.txt') as f:
     TOKEN = f.read()
+
+AltonDB = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    passwd="Password",
+    database="AltonBot"
+)
+
+mycursor = AltonDB.cursor()
 
 os.chdir('Dependencies')
 
@@ -21,10 +31,49 @@ async def on_message(message):
     if message.author == client.user:
         return
     if message.content.startswith(CMDPrefix.get(message.server.id) if message.server.id in CMDPrefix else '!'):
+        print('COMMAND DETECTED')
         messege = message.content[len(CMDPrefix.get(message.server.id)):]
         if messege.startswith('hello'):
             msg = 'Hello {0.author.mention}'.format(message)
             await client.send_message(message.channel, msg)
+        elif messege.startswith('trainingreminder '):
+            print('TRAININGREMINDER')
+            trainingid = messege[17:]
+            print (trainingid)
+            mycursor.execute("SELECT * FROM trainingsessions")
+            for row in mycursor.fetchall():
+                print(row[0])
+                if str(row[0]) == trainingid:
+                    print('FOUND ONE')
+                    trainingtype = row[1]
+                    time = str(row[2])[11:16]
+                    date = str(datetime.datetime.strptime(str(row[2])[:10], '%Y-%m-%d').strftime('%d/%m/%y'))
+                    formattedtime = str(row[2])
+                    host = row[3]
+                    cohost = row[4]
+                    TrainingTime = datetime.datetime.strptime(formattedtime, '%Y-%m-%d %H:%M:%S')
+                    currenttime = str(datetime.datetime.now() - datetime.timedelta(hours=11))
+                    currenttime = datetime.datetime.strptime(currenttime, '%Y-%m-%d %H:%M:%S.%f')
+                    diff = relativedelta(TrainingTime, currenttime)
+                    if 'Dispatch' in trainingtype or 'DS' in trainingtype:
+                        notifiedrank = 'EXPERIENCED DRIVERS'
+                        trainedrank = 'Dispatcher **[DS]**'
+                    elif 'Experience' in trainingtype or 'ED' in trainingtype:
+                        notifiedrank = 'NOVICE DRIVERS'
+                        trainedrank = 'Experienced Driver **[ED]**'
+                    print('ahsdhfadsf')
+                    await client.send_message(client.get_channel('529987720848867328'),"""Attention **""" + notifiedrank + """**, just a reminder that there'll be a """ + trainedrank + """ Training in """ + str(diff.days) + """ days, """ + str(diff.hours) + """ hours, """ + str(diff.minutes) + """ minutes  / """ + time + """! (""" + date + """) 
+
+Host: """ + host + ((""" 
+Co-host: """ + cohost + """
+""") if cohost != None else '') + """
+The link will be posted on the __**Group Wall or Group Shout (One Of the two)**__ **10** minutes before its scheduled time. [**""" + time + """**].
+
+Once you join, please spawn as a __**passenger**__ at __**Standen Station**__ and line up __**against the ticket machines!**__
+
+Thanks for reading,
+**""" + message.author.name + '**')
+                    await client.send_message(message.channel, 'Reminder sent!')
         elif messege.startswith('warn '):
             roles = []
             for i in message.author.roles:
@@ -109,7 +158,6 @@ async def on_message(message):
                     f.write(''.join(warnings))
             else:
                 await client.send_message(message.channel, 'You have to be a part of the High Rank Team to clear warnings.')
-                
         elif messege.startswith('prefix'):
             if len(messege) < 8:
                 await client.send_message(message.channel, 'Your prefix has been set to the default(!) from ' + CMDPrefix.get(message.server.id))
@@ -131,7 +179,7 @@ async def on_message(message):
 @client.event
 async def on_reaction_add(reaction,user):
     if reaction.emoji == '✅':
-        if reaction.message.channel == client.get_channel('528528451192356874'):
+        if reaction.message.channel == client.get_channel('514331989764210698'):
             trainingtype=time=host=cohost=notifiedrank=trainedrank=''
             try:
                 trainingtype = ((re.search('Type: (.*)\n', reaction.message.content)).group(1)).strip('*')
@@ -198,13 +246,23 @@ async def on_reaction_add(reaction,user):
                     pass
             print(cohost)
             print('tasdfad')
-            if 'Dispatch' in trainingtype:
+            if 'Dispatch' in trainingtype or 'DS' in trainingtype:
+                trainingtype = 'Dispatcher Training'
                 notifiedrank = 'EXPERIENCED DRIVERS'
                 trainedrank = 'Dispatcher **[DS]**'
-            elif 'Experience' in trainingtype:
+            elif 'Experience' in trainingtype or 'ED' in trainingtype:
+                trainingtype = "Experienced Driver Training"
                 notifiedrank = 'NOVICE DRIVERS'
                 trainedrank = 'Experienced Driver **[ED]**'
-            await client.send_message(client.get_channel('520701561564037143'),"""Attention **""" + notifiedrank + """**, just letting you know that there'll be a """ + trainedrank + """ Training in """ + str(diff.days) + """ days, """ + str(diff.hours) + """ hours, """ + str(diff.minutes) + """ minutes  / """ + time + """! (""" + date + """) 
+            if cohost == None:
+                cohosttemp = ');'
+                cohosttempz = ''
+            else:
+                cohosttemp = ", '" + cohost + "');"
+                cohosttempz = ", Cohost"
+            mycursor.execute("INSERT INTO trainingsessions (ID, TrainingType, TrainingTime, Host" + cohosttempz + ") VALUES ('" + reaction.message.id + "', '" + trainingtype + "', '" + str(TrainingTime) + "', '" + host + "'" + cohosttemp)
+            AltonDB.commit()
+            await client.send_message(client.get_channel('529987720848867328'),"""Attention **""" + notifiedrank + """**, just letting you know that there'll be a """ + trainedrank + """ Training in """ + str(diff.days) + """ days, """ + str(diff.hours) + """ hours, """ + str(diff.minutes) + """ minutes  / """ + time + """! (""" + date + """) 
 
 Host: """ + host + ((""" 
 Co-host: """ + cohost + """
@@ -215,6 +273,7 @@ Once you join, please spawn as a __**passenger**__ at __**Standen Station**__ an
 
 Thanks for reading,
 **""" + reaction.message.author.name + '**')
+            await client.send_message(reaction.message.channel, 'Thank you for hosting a Training session, please remember your id, ' + reaction.message.id + ', in order to run more commands for your training session in the future using AltonBot')
         # 'asdf=5;iwantthis123jasd'
         # result = re.search('asdf=5;(.*)123jasd', s)
         # print result.group(1)
