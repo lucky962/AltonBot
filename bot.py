@@ -58,12 +58,12 @@ async def on_message(message):
                     currenttime = str(datetime.datetime.now() - datetime.timedelta(hours=11))
                     currenttime = datetime.datetime.strptime(currenttime, '%Y-%m-%d %H:%M:%S.%f')
                     diff = relativedelta(TrainingTime, currenttime)
-                    if 'Dispatch' in trainingtype or 'DS' in trainingtype:
-                        notifiedrank = 'EXPERIENCED DRIVERS'
-                        trainedrank = 'Dispatcher **[DS]**'
-                    elif 'Experience' in trainingtype or 'ED' in trainingtype:
+                    if 'Dispatch' in trainingtype or 'DS' in trainingtype or 'Platform Operator' in trainingtype or 'PO' in trainingtype:
+                        notifiedrank = 'INTERMEDIATE DRIVERS'
+                        trainedrank = 'Platform Operator **[PO]**'
+                    elif 'Experience' in trainingtype or 'ED' in trainingtype or 'Intermediate' in trainingtype or 'ID' in trainingtype:
                         notifiedrank = 'NOVICE DRIVERS'
-                        trainedrank = 'Experienced Driver **[ED]**'
+                        trainedrank = 'Intermediate Driver **[ID]**'
                     print('ahsdhfadsf')
                     time = time + ' GMT'
                     await client.send_message(client.get_channel(noticechannel),"""Attention **""" + notifiedrank + """**, just a reminder that there'll be a """ + trainedrank + """ Training in **""" + str(diff.days) + """ days, """ + str(diff.hours) + """ hours, """ + str(diff.minutes) + """ minutes  / """ + time + """!** (""" + date + """) 
@@ -312,14 +312,14 @@ async def on_reaction_add(reaction,user):
             date = str(datetime.datetime.strptime(str(date), '%d/%m/%Y').strftime('%d %B %Y'))
             time = time + ' GMT'
             print('tasdfad')
-            if 'Dispatch' in trainingtype or 'DS' in trainingtype:
-                trainingtype = 'Dispatcher Training'
-                notifiedrank = 'EXPERIENCED DRIVERS'
-                trainedrank = 'Dispatcher **[DS]**'
-            elif 'Experience' in trainingtype or 'ED' in trainingtype:
-                trainingtype = "Experienced Driver Training"
+            if 'Dispatch' in trainingtype or 'DS' in trainingtype or 'Platform Operator' in trainingtype or 'PO' in trainingtype:
+                trainingtype = 'Platform Operator Training'
+                notifiedrank = 'INTERMEDIATE DRIVERS'
+                trainedrank = 'Platform Operator **[PO]**'
+            elif 'Experience' in trainingtype or 'ED' in trainingtype or 'Intermediate' in trainingtype or 'ID' in trainingtype:
+                trainingtype = "Intermediate Driver Training"
                 notifiedrank = 'NOVICE DRIVERS'
-                trainedrank = 'Experienced Driver **[ED]**'
+                trainedrank = 'Intermediate Driver **[ID]**'
             if cohost == None:
                 cohosttemp = ');'
                 cohosttempz = ''
