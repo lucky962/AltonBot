@@ -302,10 +302,10 @@ async def on_reaction_add(reaction,user):
                     await client.send_message(reaction.message.channel,'Error finding Host')
             print(host)
             try:
-                cohost = ((re.search('Co-host: (.*)\n', reaction.message.content)).group(1)).strip('*')
+                cohost = ((re.search('Co-host:(.*)\n', reaction.message.content)).group(1)).strip('*')
             except:
                 try:
-                    cohost = ((re.search('Co-host: (.*)', reaction.message.content)).group(1)).strip('*')
+                    cohost = ((re.search('Co-host:(.*)', reaction.message.content)).group(1)).strip('*')
                 except:
                     pass
             print(cohost)
