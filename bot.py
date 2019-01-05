@@ -17,8 +17,8 @@ AltonDB = mysql.connector.connect(
     database="AltonBot"
 )
 
-noticechannel = '529987720848867328'
-requestchannel = '514331989764210698'
+noticechannel = '520701561564037143'
+requestchannel = '528528451192356874'
 
 mycursor = AltonDB.cursor()
 
