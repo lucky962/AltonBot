@@ -338,7 +338,7 @@ The link will be posted on the __**Group Wall or Group Shout (One Of the two)**_
 Once you join, please spawn as a __**passenger**__ at __**Standen Station**__ and line up __**against the ticket machines!**__
 
 Thanks for reading,
-**""" + reaction.message.author.name + '**')
+**""" + reaction.message.author.nick + '**')
             await client.send_message(reaction.message.channel, 'Thank you for hosting a Training session, please remember your id, ' + reaction.message.id + ', in order to run more commands for your training session in the future using AltonBot')
         # 'asdf=5;iwantthis123jasd'
         # result = re.search('asdf=5;(.*)123jasd', s)
