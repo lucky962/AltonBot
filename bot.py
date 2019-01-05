@@ -287,7 +287,7 @@ async def on_reaction_add(reaction,user):
             elif ':' in formattedtime:
                 formattedtime = date + ' ' + formattedtime
                 TrainingTime = datetime.datetime.strptime(formattedtime, '%d/%m/%Y %H:%M')
-                time = str(datetime.datetime.strptime(str(time), '%H:%M').strfttime('%H:%M %p'))
+                time = str(datetime.datetime.strptime(str(time), '%H:%M').strftime('%H:%M %p'))
             else:
                 await client.send_message(reaction.message.channel, 'Time Format not recognised')
             currenttime = str(datetime.datetime.now() - datetime.timedelta(hours=11))
