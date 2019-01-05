@@ -58,7 +58,7 @@ async def on_message(message):
                     currenttime = str(datetime.datetime.now() - datetime.timedelta(hours=11))
                     currenttime = datetime.datetime.strptime(currenttime, '%Y-%m-%d %H:%M:%S.%f')
                     diff = relativedelta(TrainingTime, currenttime)
-                    if 'Dispatch' in trainingtype or 'DS' in trainingtype or 'Platform Operator' in trainingtype or 'PO' in trainingtype:
+                    if 'Dispatch' in trainingtype or 'DS' in trainingtype or 'Platform' in trainingtype or 'PO' in trainingtype:
                         notifiedrank = 'INTERMEDIATE DRIVERS'
                         trainedrank = 'Platform Operator **[PO]**'
                     elif 'Experience' in trainingtype or 'ED' in trainingtype or 'Intermediate' in trainingtype or 'ID' in trainingtype:
@@ -312,7 +312,7 @@ async def on_reaction_add(reaction,user):
             date = str(datetime.datetime.strptime(str(date), '%d/%m/%Y').strftime('%d %B %Y'))
             time = time + ' GMT'
             print('tasdfad')
-            if 'Dispatch' in trainingtype or 'DS' in trainingtype or 'Platform Operator' in trainingtype or 'PO' in trainingtype:
+            if 'Dispatch' in trainingtype or 'DS' in trainingtype or 'Platform' in trainingtype or 'PO' in trainingtype:
                 trainingtype = 'Platform Operator Training'
                 notifiedrank = 'INTERMEDIATE DRIVERS'
                 trainedrank = 'Platform Operator **[PO]**'
