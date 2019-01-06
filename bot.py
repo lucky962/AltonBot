@@ -204,12 +204,12 @@ Thanks for reading,
                     for i in warnings[:]:
                         if i.startswith(part[1][3:len(part[1]) - 1]):
                             warnings.remove(i)
-                    await client.send_message(message.channel, 'Successfully cleared warnings for ' + message.server.get_member(part[1][3:len(part[1]) - 1]).name)
+                    await client.send_message(message.channel, 'Successfully cleared warnings for ' + message.server.get_member(part[1][3:len(part[1]) - 1]).nick)
                 elif messege[14:].startswith('<@'):
                     for i in warnings[:]:
                         if i.startswith(part[1][2:len(part[1]) - 1]):
                             warnings.remove(i)
-                    await client.send_message(message.channel, 'Successfully cleared warnings for ' + message.server.get_member(part[1][2:len(part[1]) - 1]).name)
+                    await client.send_message(message.channel, 'Successfully cleared warnings for ' + message.server.get_member(part[1][2:len(part[1]) - 1]).nick)
                 else:
                     for i in warnings[:]:
                         if i.startswith(part[1]):
