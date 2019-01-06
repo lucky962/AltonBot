@@ -346,6 +346,7 @@ Thanks for reading,
 
 @client.event
 async def on_ready():
+    await client.change_presence(game=discord.Game(name='Alton County Railways'))
     print('Logged in as')
     print(client.user.name)
     print(client.user.id)
