@@ -282,8 +282,8 @@ async def on_reaction_add(reaction,user):
             if 'pm' in formattedtime.lower() or 'am' in formattedtime.lower():
                 formattedtime = time = formattedtime.replace(' ','')
                 formattedtime = date + ' ' + formattedtime
-                TrainingTime = datetime.datetime.strptime(formattedtime, '%d/%m/%Y %H:%M%p')
-                time = str(datetime.datetime.strptime(str(time), '%H:%M%p').strftime('%H:%M %p'))
+                TrainingTime = datetime.datetime.strptime(formattedtime, '%d/%m/%Y %-I:%M%p')
+                time = str(datetime.datetime.strptime(str(time), '%-I:%M%p').strftime('%-I:%M %p'))
             elif not ':' in formattedtime:
                 if len(formattedtime) == 4:
                     formattedtime = time = formattedtime[:2] + ':' + formattedtime[2:]
