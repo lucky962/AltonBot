@@ -244,18 +244,18 @@ async def on_reaction_add(reaction,user):
         if reaction.message.channel == client.get_channel(requestchannel):
             trainingtype=time=host=cohost=notifiedrank=trainedrank=''
             try:
-                trainingtype = ((re.search('Type: (.*)\n', reaction.message.content)).group(1)).strip('*')
+                trainingtype = (((re.search('Type:(.*)\n', reaction.message.content)).group(1)).strip('*')).strip(' ')
             except:
                 try:
-                    trainingtype = ((re.search('Type: (.*)', reaction.message.content)).group(1)).strip('*')
+                    trainingtype = (((re.search('Type:(.*)', reaction.message.content)).group(1)).strip('*')).strip(' ')
                 except:
                     await client.send_message(reaction.message.channel,'Error finding Training Type')
             print(trainingtype)
             try:
-                time = ((re.search('Time: (.*)\n', reaction.message.content)).group(1)).strip('*')
+                time = (((re.search('Time:(.*)\n', reaction.message.content)).group(1)).strip('*')).strip(' ')
             except:
                 try:
-                    time = ((re.search('Time: (.*)', reaction.message.content)).group(1)).strip('*')
+                    time = (((re.search('Time:(.*)', reaction.message.content)).group(1)).strip('*')).strip(' ')
                 except:
                     await client.send_message(reaction.message.channel,'Error finding Time')
             print(time)
@@ -265,10 +265,10 @@ async def on_reaction_add(reaction,user):
                 formattedtime = time = ((re.search('Time: (.*)', reaction.message.content)).group(1)).strip()
             print(formattedtime)
             try:
-                date = ((re.search('Date: (.*)\n', reaction.message.content)).group(1)).strip('*')
+                date = (((re.search('Date:(.*)\n', reaction.message.content)).group(1)).strip('*')).strip(' ')
             except:
                 try:
-                    date = ((re.search('Date: (.*)', reaction.message.content)).group(1)).strip('*')
+                    date = (((re.search('Date:(.*)', reaction.message.content)).group(1)).strip('*')).strip(' ')
                 except:
                     await client.send_message(reaction.message.channel,'Error finding Date')
             print(date)
@@ -294,18 +294,18 @@ async def on_reaction_add(reaction,user):
             currenttime = datetime.datetime.strptime(currenttime, '%Y-%m-%d %H:%M:%S.%f')
             diff = relativedelta(TrainingTime, currenttime)
             try:
-                host = ((re.search('Host: (.*)\n', reaction.message.content)).group(1)).strip('*')
+                host = (((re.search('Host:(.*)\n', reaction.message.content)).group(1)).strip('*')).strip(' ')
             except:
                 try:
-                    host = ((re.search('Host: (.*)', reaction.message.content)).group(1)).strip('*')
+                    host = (((re.search('Host:(.*)', reaction.message.content)).group(1)).strip('*')).strip(' ')
                 except:
                     await client.send_message(reaction.message.channel,'Error finding Host')
             print(host)
             try:
-                cohost = ((re.search('Co-host:(.*)\n', reaction.message.content)).group(1)).strip('*')
+                cohost = (((re.search('Co-host:(.*)\n', reaction.message.content)).group(1)).strip('*')).strip(' ')
             except:
                 try:
-                    cohost = ((re.search('Co-host:(.*)', reaction.message.content)).group(1)).strip('*')
+                    cohost = (((re.search('Co-host:(.*)', reaction.message.content)).group(1)).strip('*')).strip(' ')
                 except:
                     pass
             print(cohost)
