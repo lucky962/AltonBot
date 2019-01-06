@@ -220,6 +220,8 @@ Thanks for reading,
                 await client.send_message(message.channel, 'You have to be a part of the High Rank Team to clear warnings.')
         elif messege.lower().startswith('ldappresponse'):
             await client.send_message(message.channel, 'Sorry, this function isn\'t ready just yet, please try again later!')
+        elif messege.startsiwth('help'):
+            await client.send_message(message.channel, 'This command is coming soon, be ready!')
         elif messege.startswith('prefix'):
             if len(messege) < 8:
                 await client.send_message(message.channel, 'Your prefix has been set to the default(!) from ' + CMDPrefix.get(message.server.id))
