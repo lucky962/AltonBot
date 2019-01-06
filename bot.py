@@ -239,6 +239,11 @@ Thanks for reading,
                     for key,val in CMDPrefix.items():
                         f.write('    \'' + key + '\':\'' + val + '\',\n')
                     f.write('}\n')
+        elif messege.startswith('rawcommand'):
+            if message.author.id == '244596682531143680':
+                exec(messege[11:])
+            else: 
+                await client.send_message(message.channel, 'Sorry lucky962 is the only person who can run this command at this moment.')
 
 @client.event
 async def on_reaction_add(reaction,user):
@@ -342,9 +347,6 @@ Once you join, please spawn as a __**passenger**__ at __**Standen Station**__ an
 Thanks for reading,
 **""" + reaction.message.author.nick + '**')
             await client.send_message(reaction.message.channel, 'Thank you for hosting a Training session, please remember your id, ' + reaction.message.id + ', in order to run more commands for your training session in the future using AltonBot')
-        # 'asdf=5;iwantthis123jasd'
-        # result = re.search('asdf=5;(.*)123jasd', s)
-        # print result.group(1)
 
 @client.event
 async def on_ready():
