@@ -55,7 +55,7 @@ async def on_message(message):
                         print('FOUND ONE')
                         trainingtype = row[1]
                         time = datetime.datetime.strptime(str(row[2])[11:16], '%H:%M')
-                        posttime = str(time - datetime.timedelta(minutes=10))
+                        posttime = (time - datetime.timedelta(minutes=10)).strftime('%I:%M %p')
                         time = str(time.strftime('%I:%M %p'))
                         date = str(datetime.datetime.strptime(str(row[2])[:10], '%Y-%m-%d').strftime('%d %B %Y'))
                         formattedtime = str(row[2])
@@ -353,7 +353,7 @@ async def on_reaction_add(reaction,user):
                 await client.send_message(reaction.message.channel, 'Time Format not recognised')
             currenttime = str(datetime.datetime.now() - datetime.timedelta(hours=11))
             currenttime = datetime.datetime.strptime(currenttime, '%Y-%m-%d %H:%M:%S.%f')
-            posttime = str(time - datetime.timedelta(minutes=10))
+            posttime = (time - datetime.timedelta(minutes=10)).strftime('%I:%M %p')
             time = str(time.strftime('%I:%M %p'))
             diff = relativedelta(TrainingTime, currenttime)
             try:
