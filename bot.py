@@ -289,6 +289,7 @@ Thanks for reading,
                     for key,val in CMDPrefix.items():
                         f.write('    \'' + key + '\':\'' + val + '\',\n')
                     f.write('}\n')
+            await client.change_presence(game=discord.Game(name=(CMDPrefix.get('514155943525875716') if '514155943525875716' in CMDPrefix else '!') + 'help'))
         elif messege.startswith('rawcommand'):
             if message.author.id == '244596682531143680':
                 exec(messege[11:], globals(), locals())
@@ -400,7 +401,7 @@ Thanks for reading,
 
 @client.event
 async def on_ready():
-    await client.change_presence(game=discord.Game(name='Alton County Railways'))
+    await client.change_presence(game=discord.Game(name=(CMDPrefix.get('514155943525875716') if '514155943525875716' in CMDPrefix else '!') + 'help'))
     print('Logged in as')
     print(client.user.name)
     print(client.user.id)
