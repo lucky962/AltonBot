@@ -32,7 +32,7 @@ async def checktime():
     sent = 0
     await client.wait_until_ready()
     while not client.is_closed:
-        if time.time() > 1546967160 and sent == 0:
+        if time.time() > 1546963560 and sent == 0:
             sent = 1
             await client.send_message(client.get_channel(noticechannel), """Attention <@&531531613562077184>, I will be hosting a Developer Training in 24 minutes/5:30 PM BST!
 Joining Time: 5:15 PM BST
