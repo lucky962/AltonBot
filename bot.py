@@ -71,6 +71,10 @@ async def on_message(message):
                         elif 'Experience' in trainingtype or 'ED' in trainingtype or 'Intermediate' in trainingtype or 'ID' in trainingtype:
                             notifiedrank = 'NOVICE DRIVERS'
                             trainedrank = 'Intermediate Driver **[ID]**'
+                        elif 'Dev' in trainingtype:
+                            trainingtype = "Developer Training"
+                            notifiedrank = "Trainee Developer"
+                            trainedrank = "Developer"
                         print('ahsdhfadsf')
                         time = time + ' GMT'
                         await client.send_message(client.get_channel(noticechannel),"""Attention **""" + notifiedrank + """**, just a reminder that there'll be a """ + trainedrank + """ Training in **""" + str(diff.days) + """ days, """ + str(diff.hours) + """ hours, """ + str(diff.minutes) + """ minutes  / """ + time + """!** (""" + date + """) 
@@ -384,6 +388,10 @@ async def on_reaction_add(reaction,user):
                 trainingtype = "Intermediate Driver Training"
                 notifiedrank = 'NOVICE DRIVERS'
                 trainedrank = 'Intermediate Driver **[ID]**'
+            elif 'Dev' in trainingtype:
+                trainingtype = "Developer Training"
+                notifiedrank = "Trainee Developer"
+                trainedrank = "Developer"
             if cohost == None:
                 cohosttemp = ');'
                 cohosttempz = ''
