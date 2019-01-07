@@ -40,33 +40,38 @@ async def on_message(message):
             msg = 'Hello {0.author.mention}'.format(message)
             await client.send_message(message.channel, msg)
         elif messege.startswith('trainingreminder '):
-            print('TRAININGREMINDER')
-            trainingid = messege[17:]
-            print (trainingid)
-            mycursor.execute("SELECT * FROM trainingsessions")
-            for row in mycursor.fetchall():
-                print(row[0])
-                if str(row[0]) == trainingid:
-                    print('FOUND ONE')
-                    trainingtype = row[1]
-                    time = str(datetime.datetime.strptime(str(row[2])[11:16], '%H:%M').strftime('%I:%M %p'))
-                    date = str(datetime.datetime.strptime(str(row[2])[:10], '%Y-%m-%d').strftime('%d %B %Y'))
-                    formattedtime = str(row[2])
-                    host = row[3]
-                    cohost = row[4]
-                    TrainingTime = datetime.datetime.strptime(formattedtime, '%Y-%m-%d %H:%M:%S')
-                    currenttime = str(datetime.datetime.now() - datetime.timedelta(hours=11))
-                    currenttime = datetime.datetime.strptime(currenttime, '%Y-%m-%d %H:%M:%S.%f')
-                    diff = relativedelta(TrainingTime, currenttime)
-                    if 'Dispatch' in trainingtype or 'DS' in trainingtype or 'Platform' in trainingtype or 'PO' in trainingtype:
-                        notifiedrank = 'INTERMEDIATE DRIVERS'
-                        trainedrank = 'Platform Operator **[PO]**'
-                    elif 'Experience' in trainingtype or 'ED' in trainingtype or 'Intermediate' in trainingtype or 'ID' in trainingtype:
-                        notifiedrank = 'NOVICE DRIVERS'
-                        trainedrank = 'Intermediate Driver **[ID]**'
-                    print('ahsdhfadsf')
-                    time = time + ' GMT'
-                    await client.send_message(client.get_channel(noticechannel),"""Attention **""" + notifiedrank + """**, just a reminder that there'll be a """ + trainedrank + """ Training in **""" + str(diff.days) + """ days, """ + str(diff.hours) + """ hours, """ + str(diff.minutes) + """ minutes  / """ + time + """!** (""" + date + """) 
+            roles = []
+            for i in message.author.roles:
+                roles.append(i.name)
+            print(roles)
+            if 'Executive Team' in roles or 'Management Team' in roles or 'High Rank Team' in roles:
+                print('TRAININGREMINDER')
+                trainingid = messege[17:]
+                print (trainingid)
+                mycursor.execute("SELECT * FROM trainingsessions")
+                for row in mycursor.fetchall():
+                    print(row[0])
+                    if str(row[0]) == trainingid:
+                        print('FOUND ONE')
+                        trainingtype = row[1]
+                        time = str(datetime.datetime.strptime(str(row[2])[11:16], '%H:%M').strftime('%I:%M %p'))
+                        date = str(datetime.datetime.strptime(str(row[2])[:10], '%Y-%m-%d').strftime('%d %B %Y'))
+                        formattedtime = str(row[2])
+                        host = row[3]
+                        cohost = row[4]
+                        TrainingTime = datetime.datetime.strptime(formattedtime, '%Y-%m-%d %H:%M:%S')
+                        currenttime = str(datetime.datetime.now() - datetime.timedelta(hours=11))
+                        currenttime = datetime.datetime.strptime(currenttime, '%Y-%m-%d %H:%M:%S.%f')
+                        diff = relativedelta(TrainingTime, currenttime)
+                        if 'Dispatch' in trainingtype or 'DS' in trainingtype or 'Platform' in trainingtype or 'PO' in trainingtype:
+                            notifiedrank = 'INTERMEDIATE DRIVERS'
+                            trainedrank = 'Platform Operator **[PO]**'
+                        elif 'Experience' in trainingtype or 'ED' in trainingtype or 'Intermediate' in trainingtype or 'ID' in trainingtype:
+                            notifiedrank = 'NOVICE DRIVERS'
+                            trainedrank = 'Intermediate Driver **[ID]**'
+                        print('ahsdhfadsf')
+                        time = time + ' GMT'
+                        await client.send_message(client.get_channel(noticechannel),"""Attention **""" + notifiedrank + """**, just a reminder that there'll be a """ + trainedrank + """ Training in **""" + str(diff.days) + """ days, """ + str(diff.hours) + """ hours, """ + str(diff.minutes) + """ minutes  / """ + time + """!** (""" + date + """) 
 
 Host: """ + host + ((""" 
 Co-host: """ + cohost + """
@@ -77,7 +82,7 @@ Once you join, please spawn as a __**passenger**__ at __**Standen Station**__ an
 
 Thanks for reading,
 **""" + message.author.nick + '**')
-                    await client.send_message(message.channel, 'Reminder sent!')
+                        await client.send_message(message.channel, 'Reminder sent!')
         elif messege.startswith('warn '):
             roles = []
             for i in message.author.roles:
@@ -158,7 +163,7 @@ Thanks for reading,
                 except IndexError:
                     await client.send_message(message.channel, 'A reason is needed to issue a warning.')
             else:
-                await client.send_message(message.channel, ('Sorry, you have to be a part of the High Rank Team to warn.'))
+                await client.send_message(message.channel, ('Sorry, you have to be an LD+ to warn.'))
         elif messege.startswith('kick '):
             print(messege[5:])
             print((messege[7:].rstrip('>')))
@@ -178,7 +183,7 @@ Thanks for reading,
                 except discord.errors.Forbidden:
                     await client.send_message(message.channel, 'Sorry, I don\'t have the permissions to kick that user yet.')
             else:
-                await client.send_message(message.channel, 'Sorry, you have to be a part of the High Rank Team to kick.')
+                await client.send_message(message.channel, 'Sorry, you have to be an LD+ to kick.')
         elif messege.startswith('warnings'):
             roles = []
             msg = []
@@ -217,11 +222,52 @@ Thanks for reading,
                 with open('warnlist.txt','w') as f:
                     f.write(''.join(warnings))
             else:
-                await client.send_message(message.channel, 'You have to be a part of the High Rank Team to clear warnings.')
+                await client.send_message(message.channel, 'You have to be an LD+ to clear warnings.')
         elif messege.lower().startswith('ldappresponse'):
             await client.send_message(message.channel, 'Sorry, this function isn\'t ready just yet, please try again later!')
         elif messege.startswith('help'):
             await client.send_message(message.channel, 'This command is coming soon, be ready!')
+            HelpMsg = discord.Embed(
+                title="Help Page",
+                description="This is a page full of commands you can use with AltonBot",
+                color=3447003
+            )
+            HelpMsg.set_author(
+                name='Insults Bot',
+                icon_url=client.user.avator_url
+            )
+            HelpMsg.add_field(
+                name=(CMDPrefix.get(message.server.id) if message.server.id in CMDPrefix else '!') + "help",
+                value="Displays this help page."
+            )
+            HelpMsg.add_field(
+                name=(CMDPrefix.get(message.server.id) if message.server.id in CMDPrefix else '!') + "trainingreminder [id]",
+                value="**LD+ Only** - Sends a training reminder about the specified training."
+            )
+            HelpMsg.add_field(
+                name=(CMDPrefix.get(message.server.id) if message.server.id in CMDPrefix else '!') + "warn [user]",
+                value="**LD+ Only** - warns a user"
+            )
+            HelpMsg.add_field(
+                name=(CMDPrefix.get(message.server.id) if message.server.id in CMDPrefix else '!') + "kick [user]",
+                value="**LD+ Only** - kicks a user"
+            )
+            HelpMsg.add_field(
+                name=(CMDPrefix.get(message.server.id) if message.server.id in CMDPrefix else '!') + "ban [user] [time]",
+                value="**MOD+ Only** - bans a user indefinetely or for a certain time. **COMING SOON**"
+            )
+            HelpMsg.add_field(
+                name=(CMDPrefix.get(message.server.id) if message.server.id in CMDPrefix else '!') + "warnings",
+                value="Displays all warnings currently stored in memory."
+            )
+            HelpMsg.add_field(
+                name=(CMDPrefix.get(message.server.id) if message.server.id in CMDPrefix else '!') + "clearwarnings [user]",
+                value="**LD+ Only** - clears the warnings of a certain player."
+            )
+            HelpMsg.add_field(
+                name=(CMDPrefix.get(message.server.id) if message.server.id in CMDPrefix else '!') + "prefix",
+                value="Changes the prefix for commands"
+            )
         elif messege.startswith('prefix'):
             if len(messege) < 8:
                 await client.send_message(message.channel, 'Your prefix has been set to the default(!) from ' + CMDPrefix.get(message.server.id))
@@ -241,7 +287,7 @@ Thanks for reading,
                     f.write('}\n')
         elif messege.startswith('rawcommand'):
             if message.author.id == '244596682531143680':
-                exec(messege[11:])
+                exec(messege[11:], globals(), locals())
             else: 
                 await client.send_message(message.channel, 'Sorry lucky962 is the only person who can run this command at this moment.')
 
