@@ -54,9 +54,9 @@ async def on_message(message):
                     if str(row[0]) == trainingid:
                         print('FOUND ONE')
                         trainingtype = row[1]
-                        time = datetime.datetime.strptime(str(row[2])[11:16], '%H:%M').strftime('%I:%M %p')
+                        time = datetime.datetime.strptime(str(row[2])[11:16], '%H:%M')
                         posttime = str(time - datetime.timedelta(minutes=10))
-                        time = str(time)
+                        time = str(time.strftime('%I:%M %p'))
                         date = str(datetime.datetime.strptime(str(row[2])[:10], '%Y-%m-%d').strftime('%d %B %Y'))
                         formattedtime = str(row[2])
                         host = row[3]
@@ -336,7 +336,7 @@ async def on_reaction_add(reaction,user):
                 formattedtime = time = formattedtime.replace(' ','')
                 formattedtime = date + ' ' + formattedtime
                 TrainingTime = datetime.datetime.strptime(formattedtime, '%d/%m/%Y %I:%M%p')
-                time = datetime.datetime.strptime(str(time), '%I:%M%p').strftime('%I:%M %p')
+                time = datetime.datetime.strptime(str(time), '%I:%M%p')
             elif not ':' in formattedtime:
                 if len(formattedtime) == 4:
                     formattedtime = time = formattedtime[:2] + ':' + formattedtime[2:]
@@ -344,17 +344,17 @@ async def on_reaction_add(reaction,user):
                     formattedtime = time = '0' + formattedtime[:1] + ':' + formattedtime[1:]
                 formattedtime = date + ' ' + formattedtime  
                 TrainingTime = datetime.datetime.strptime(formattedtime, '%d/%m/%Y %H:%M')
-                time = datetime.datetime.strptime(str(time), '%H:%M').stftime('%I:%M %p')
+                time = datetime.datetime.strptime(str(time), '%H:%M')
             elif ':' in formattedtime:
                 formattedtime = date + ' ' + formattedtime
                 TrainingTime = datetime.datetime.strptime(formattedtime, '%d/%m/%Y %H:%M')
-                time = datetime.datetime.strptime(str(time), '%H:%M').strftime('%I:%M %p')
+                time = datetime.datetime.strptime(str(time), '%H:%M')
             else:
                 await client.send_message(reaction.message.channel, 'Time Format not recognised')
             currenttime = str(datetime.datetime.now() - datetime.timedelta(hours=11))
             currenttime = datetime.datetime.strptime(currenttime, '%Y-%m-%d %H:%M:%S.%f')
             posttime = str(time - datetime.timedelta(minutes=10))
-            time = str(time)
+            time = str(time.strftime('%I:%M %p'))
             diff = relativedelta(TrainingTime, currenttime)
             try:
                 host = (((re.search('Host:(.*)\n', reaction.message.content)).group(1)).strip('*')).strip(' ')
