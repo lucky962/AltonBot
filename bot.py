@@ -267,11 +267,11 @@ Thanks for reading,
                 name=(CMDPrefix.get(message.server.id) if message.server.id in CMDPrefix else '!') + "prefix",
                 value="Changes the prefix for commands"
             )
-            HelpMsg.set_footor(
+            HelpMsg.set_footer(
                 icon_url=client.user.avatar_url,
                 text="© Alton County Railways"
             )
-            await client.send_message(message.channel, emmbed=HelpMsg)
+            await client.send_message(message.channel, embed=HelpMsg)
         elif messege.startswith('prefix'):
             if len(messege) < 8:
                 await client.send_message(message.channel, 'Your prefix has been set to the default(!) from ' + CMDPrefix.get(message.server.id))
