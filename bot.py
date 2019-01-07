@@ -54,7 +54,9 @@ async def on_message(message):
                     if str(row[0]) == trainingid:
                         print('FOUND ONE')
                         trainingtype = row[1]
-                        time = str(datetime.datetime.strptime(str(row[2])[11:16], '%H:%M').strftime('%I:%M %p'))
+                        time = datetime.datetime.strptime(str(row[2])[11:16], '%H:%M').strftime('%I:%M %p')
+                        posttime = str(time - datetime.timedelta(minutes=10))
+                        time = str(time)
                         date = str(datetime.datetime.strptime(str(row[2])[:10], '%Y-%m-%d').strftime('%d %B %Y'))
                         formattedtime = str(row[2])
                         host = row[3]
@@ -334,7 +336,7 @@ async def on_reaction_add(reaction,user):
                 formattedtime = time = formattedtime.replace(' ','')
                 formattedtime = date + ' ' + formattedtime
                 TrainingTime = datetime.datetime.strptime(formattedtime, '%d/%m/%Y %I:%M%p')
-                time = str(datetime.datetime.strptime(str(time), '%I:%M%p').strftime('%I:%M %p'))
+                time = datetime.datetime.strptime(str(time), '%I:%M%p').strftime('%I:%M %p')
             elif not ':' in formattedtime:
                 if len(formattedtime) == 4:
                     formattedtime = time = formattedtime[:2] + ':' + formattedtime[2:]
@@ -342,14 +344,17 @@ async def on_reaction_add(reaction,user):
                     formattedtime = time = '0' + formattedtime[:1] + ':' + formattedtime[1:]
                 formattedtime = date + ' ' + formattedtime  
                 TrainingTime = datetime.datetime.strptime(formattedtime, '%d/%m/%Y %H:%M')
+                time = datetime.datetime.strptime(str(time), '%H:%M').stftime('%I:%M %p')
             elif ':' in formattedtime:
                 formattedtime = date + ' ' + formattedtime
                 TrainingTime = datetime.datetime.strptime(formattedtime, '%d/%m/%Y %H:%M')
-                time = str(datetime.datetime.strptime(str(time), '%H:%M').strftime('%I:%M %p'))
+                time = datetime.datetime.strptime(str(time), '%H:%M').strftime('%I:%M %p')
             else:
                 await client.send_message(reaction.message.channel, 'Time Format not recognised')
             currenttime = str(datetime.datetime.now() - datetime.timedelta(hours=11))
             currenttime = datetime.datetime.strptime(currenttime, '%Y-%m-%d %H:%M:%S.%f')
+            posttime = str(time - datetime.timedelta(minutes=10))
+            time = str(time)
             diff = relativedelta(TrainingTime, currenttime)
             try:
                 host = (((re.search('Host:(.*)\n', reaction.message.content)).group(1)).strip('*')).strip(' ')
@@ -367,7 +372,8 @@ async def on_reaction_add(reaction,user):
                 except:
                     pass
             print(cohost)
-            date = str(datetime.datetime.strptime(str(date), '%d/%m/%Y').strftime('%d %B %Y'))
+            date = datetime.datetime.strptime(str(date), '%d/%m/%Y').strftime('%d %B %Y')
+            date = str(date)
             time = time + ' GMT'
             print('tasdfad')
             if 'Dispatch' in trainingtype or 'DS' in trainingtype or 'Platform' in trainingtype or 'PO' in trainingtype:
@@ -391,7 +397,7 @@ async def on_reaction_add(reaction,user):
 Host: """ + host + ((""" 
 Co-host: """ + cohost + """
 """) if cohost != None else '\n') + """
-The link will be posted on the __**Group Wall or Group Shout (One Of the two)**__ **10** minutes before its scheduled time. [**""" + time + """**].
+The link will be posted on the __**Group Wall or Group Shout (One Of the two)**__ **10** minutes before its scheduled time. [**""" + posttime + """**].
 
 Once you join, please spawn as a __**passenger**__ at __**Standen Station**__ and line up __**against the ticket machines!**__
 
