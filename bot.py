@@ -78,7 +78,7 @@ async def on_message(message):
 Host: """ + host + ((""" 
 Co-host: """ + cohost + """
 """) if cohost != None else '\n') + """
-The link will be posted on the __**Group Wall or Group Shout (One Of the two)**__ **10** minutes before its scheduled time. [**""" + time + """**].
+The link will be posted on the __**Group Wall or Group Shout (One Of the two)**__ **10** minutes before its scheduled time. [**""" + posttime + """**].
 
 Once you join, please spawn as a __**passenger**__ at __**Standen Station**__ and line up __**against the ticket machines!**__
 
