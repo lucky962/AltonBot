@@ -226,7 +226,6 @@ Thanks for reading,
         elif messege.lower().startswith('ldappresponse'):
             await client.send_message(message.channel, 'Sorry, this function isn\'t ready just yet, please try again later!')
         elif messege.startswith('help'):
-            await client.send_message(message.channel, 'This command is coming soon, be ready!')
             HelpMsg = discord.Embed(
                 title="Help Page",
                 description="This is a page full of commands you can use with AltonBot",
@@ -234,7 +233,7 @@ Thanks for reading,
             )
             HelpMsg.set_author(
                 name='Insults Bot',
-                icon_url=client.user.avator_url
+                icon_url=client.user.avatar_url
             )
             HelpMsg.add_field(
                 name=(CMDPrefix.get(message.server.id) if message.server.id in CMDPrefix else '!') + "help",
@@ -268,6 +267,11 @@ Thanks for reading,
                 name=(CMDPrefix.get(message.server.id) if message.server.id in CMDPrefix else '!') + "prefix",
                 value="Changes the prefix for commands"
             )
+            HelpMsg.set_footor(
+                icon_url=client.user.avatar_url,
+                text="© Alton County Railways"
+            )
+            await client.send_message(message.channel, emmbed=HelpMsg)
         elif messege.startswith('prefix'):
             if len(messege) < 8:
                 await client.send_message(message.channel, 'Your prefix has been set to the default(!) from ' + CMDPrefix.get(message.server.id))
