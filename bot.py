@@ -187,7 +187,16 @@ async def on_message(message):
                 for i in warnings:
                     parts = i.split(' ', maxsplit=2)
                     print(parts)
-                    msg.append((((('*' + str(client.get_user(int(parts[0])).nick)) + '* was warned by *') + str(client.get_user(int(parts[1])).nick)) + '* for reason: ') + parts[2])
+                    try:
+                        msg.append((((('*' + str(client.get_user(int(parts[0])).nick)) + '* was warned by *') + str(client.get_user(int(parts[1])).nick)) + '* for reason: ') + parts[2])
+                    except AttributeError:
+                        try:
+                            msg.append('*' + parts[0] + '* was warned by *' + str(client.get_user(int(parts[1])).nick) + '* for reason: ' + parts[2])
+                        except AttributeError:
+                            try:
+                                msg.append('*' + str(client.get_user(int(parts[0])).nick) + '* was warned by *' + parts[1] + '* for reason: ' + parts[2])
+                            except AttributeError:
+                                msg.append('*' + parts[0] + '* was warned by *' + parts[1] + '* for reason: ' + parts[2])
                 await message.channel.send(''.join(msg))
         elif messege.startswith('clearwarnings'):
             part = message.content.split(' ')
