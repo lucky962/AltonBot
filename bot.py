@@ -23,7 +23,7 @@ async def on_message(message):
     print(message.content)
     if message.author == client.user:
         return
-    if message.content.startswith(CMDPrefix.get(message.guild.id) if message.guild.id in CMDPrefix else '!'):
+    if message.content.startswith(CMDPrefix.get(message.guild.id)):
         await message.channel.trigger_typing()
         print('COMMAND DETECTED')
         messege = message.content[len(CMDPrefix.get(message.guild.id)):]
@@ -232,14 +232,16 @@ async def on_message(message):
         elif messege.startswith('help'):
             HelpMsg = discord.Embed(title='Help Page', description='This is a page full of commands you can use with AltonBot', color=3447003)
             HelpMsg.set_author(name='Insults Bot', icon_url=client.user.avatar_url)
-            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id) if message.guild.id in CMDPrefix else '!') + 'help', value='Displays this help page.')
-            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id) if message.guild.id in CMDPrefix else '!') + 'trainingreminder [id]', value='**LD+ Only** - Sends a training reminder about the specified training.')
-            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id) if message.guild.id in CMDPrefix else '!') + 'warn [user]', value='**LD+ Only** - warns a user')
-            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id) if message.guild.id in CMDPrefix else '!') + 'kick [user]', value='**LD+ Only** - kicks a user')
-            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id) if message.guild.id in CMDPrefix else '!') + 'ban [user] [time]', value='**MOD+ Only** - bans a user indefinetely or for a certain time. **COMING SOON**')
-            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id) if message.guild.id in CMDPrefix else '!') + 'warnings', value='Displays all warnings currently stored in memory.')
-            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id) if message.guild.id in CMDPrefix else '!') + 'clearwarnings [user]', value='**LD+ Only** - clears the warnings of a certain player.')
-            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id) if message.guild.id in CMDPrefix else '!') + 'prefix', value='Changes the prefix for commands')
+            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'help', value='Displays this help page.')
+            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'trainingreminder [id]', value='**LD+ Only** - Sends a training reminder about the specified training.')
+            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'warn [user]', value='**LD+ Only** - warns a user')
+            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'kick [user]', value='**LD+ Only** - kicks a user')
+            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'ban [user] [time]', value='**MOD+ Only** - bans a user indefinetely or for a certain time. **COMING SOON**')
+            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'warnings', value='Displays all warnings currently stored in memory.')
+            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'clearwarnings [user]', value='**LD+ Only** - clears the warnings of a certain player.')
+            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'prefix', value='Changes the prefix for commands')
+            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'edittraining [id] [fieldtochange]: [valuetochangeto]', value='**LD+ Only** - edits training session specified **COMING SOON**')
+            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'deletetraining [id]', value='**LD+ Only** - deletes training session specified **COMING SOON**')
             HelpMsg.set_footer(icon_url=client.user.avatar_url, text='© Alton County Railways')
             await message.channel.send(embed=HelpMsg)
         elif messege.startswith('prefix'):
