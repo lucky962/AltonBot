@@ -13,7 +13,7 @@ with open('BotToken.txt') as f:
 AltonDB = mysql.connector.connect(host='localhost', user='root', passwd='Password', database='AltonBot')
 noticechannel = 520701561564037143
 requestchannel = 528528451192356874
-mycursor = AltonDB.cursor()
+mycursor = AltonDB.cursor(buffered=True)
 os.chdir('Dependencies')
 client = discord.Client()
 
@@ -56,15 +56,12 @@ async def on_message(message):
                         currenttime = datetime.datetime.strptime(currenttime, '%Y-%m-%d %H:%M:%S.%f')
                         diff = relativedelta(TrainingTime, currenttime)
                         if ('Dispatch' in trainingtype) or ('DS' in trainingtype) or ('Platform' in trainingtype) or ('PO' in trainingtype):
-                            print(trainingtype)
                             notifiedrank = 'INTERMEDIATE DRIVERS'
                             trainedrank = 'Platform Operator **[PO]**'
                         elif ('Experience' in trainingtype) or ('ED' in trainingtype) or ('Intermediate' in trainingtype) or ('ID' in trainingtype):
-                            print(trainingtype)
                             notifiedrank = 'NOVICE DRIVERS'
                             trainedrank = 'Intermediate Driver **[ID]**'
                         elif 'Dev' in trainingtype:
-                            print(trainingtype)
                             trainingtype = 'Developer Training'
                             notifiedrank = 'Trainee Developer'
                             trainedrank = 'Developer'
@@ -74,6 +71,18 @@ async def on_message(message):
                         time = time + ' GMT'
                         await client.get_channel(noticechannel).send((((((((((((((((((((('Attention **' + notifiedrank) + "**, just a reminder that there'll be a ") + trainedrank) + ' Training in **') + str(diff.days)) + ' days, ') + str(diff.hours)) + ' hours, ') + str(diff.minutes)) + ' minutes  / ') + time) + '!** (') + date) + ') \n\nHost: ') + host) + ((' \nCo-host: ' + cohost) + '\n' if cohost != None else '\n')) + '\nThe link will be posted on the __**Group Wall or Group Shout (One Of the two)**__ **10** minutes before its scheduled time. [**') + posttime) + '**].\n\nOnce you join, please spawn as a __**passenger**__ at __**Standen Station**__ and line up __**against the ticket machines!**__\n\nThanks for reading,\n**') + message.author.nick) + '**')
                         await message.channel.send('Reminder sent!')
+        elif messege.startswith('deletetraining '):
+            roles = []
+            for i in message.author.roles:
+                roles.append(i.name)
+            print(roles)
+            if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
+                trainingid = messege[15:]
+                mycursor.execute('SELECT * FROM trainingsessions')
+                mycursor.execute('DELETE FROM `trainingsessions` WHERE `trainingsessions`.`ID` = ' + trainingid)
+                AltonDB.commit()
+                await message.channel.send('Successfully deleted ' + str(mycursor.rowcount) + ' training session(s)')
+                
         elif messege.startswith('warn '):
             roles = []
             for i in message.author.roles:
