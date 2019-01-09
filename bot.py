@@ -191,12 +191,12 @@ async def on_message(message):
                         msg.append((((('*' + str(message.guild.get_member(int(parts[0])).nick)) + '* was warned by *') + str(message.guild.get_member(int(parts[1])).nick)) + '* for reason: ') + parts[2])
                     except AttributeError:
                         try:
-                            msg.append('*' + client.get_user(int(parts[0])).name + '* was warned by *' + str(message.guild.get_member(int(parts[1])).nick) + '* for reason: ' + parts[2])
+                            msg.append('*' + client.get_user_info(int(parts[0])).name + '* was warned by *' + str(message.guild.get_member(int(parts[1])).nick) + '* for reason: ' + parts[2])
                         except AttributeError:
                             try:
-                                msg.append('*' + str(message.guild.get_member(int(parts[0])).nick) + '* was warned by *' + client.get_user(int(parts[1])).name + '* for reason: ' + parts[2])
+                                msg.append('*' + str(message.guild.get_member(int(parts[0])).nick) + '* was warned by *' + client.get_user_info(int(parts[1])).name + '* for reason: ' + parts[2])
                             except AttributeError:
-                                msg.append('*' + client.get_user(int(parts[0])).name + '* was warned by *' + client.get_user(int(parts[1])).name + '* for reason: ' + parts[2])
+                                msg.append('*' + client.get_user_info(int(parts[0])).name + '* was warned by *' + client.get_user_info(int(parts[1])).name + '* for reason: ' + parts[2])
                 await message.channel.send(''.join(msg))
         elif messege.startswith('clearwarnings'):
             part = message.content.split(' ')
