@@ -201,12 +201,12 @@ async def on_message(message):
                     for i in warnings[:]:
                         if i.startswith(part[1][3:len(part[1]) - 1]):
                             warnings.remove(i)
-                    await message.channel.send('Successfully cleared warnings for ' + message.guild.get_member(int(part[1][3:len(part[1]) - 1])).nick)
+                    await message.channel.send('Successfully cleared warnings for ' + client.get_user(int(part[1][3:len(part[1]) - 1])).nick)
                 elif messege[14:].startswith('<@'):
                     for i in warnings[:]:
                         if i.startswith(part[1][2:len(part[1]) - 1]):
                             warnings.remove(i)
-                    await message.channel.send('Successfully cleared warnings for ' + message.guild.get_member(int(part[1][2:len(part[1]) - 1])).nick)
+                    await message.channel.send('Successfully cleared warnings for ' + client.get_user(int(part[1][2:len(part[1]) - 1])).nick)
                 else:
                     for i in warnings[:]:
                         if i.startswithint(part[1]):
