@@ -230,7 +230,7 @@ async def on_message(message):
         elif messege.lower().startswith('ldappresponse'):
             await message.channel.send("Sorry, this function isn't ready just yet, please try again later!")
         elif messege.lower().startswith('help moderation'):
-            HelpMsg = discord.Embed(title='Help Page', description='This is a page full of commands you can use with AltonBot', color=3447003)
+            HelpMsg = discord.Embed(title='Help Page', description='This is a page full of moderation commands you can use with AltonBot', color=3447003)
             HelpMsg.set_author(name='Insults Bot', icon_url=client.user.avatar_url)
             HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'warn [user]', value='**LD+ Only** - warns a user')
             HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'kick [user]', value='**LD+ Only** - kicks a user')
@@ -240,7 +240,7 @@ async def on_message(message):
             HelpMsg.set_footer(icon_url=client.user.avatar_url, text='© Alton County Railways')
             await message.channel.send(embed=HelpMsg)
         elif messege.lower().startswith('help training'):
-            HelpMsg = discord.Embed(title='Help Page', description='This is a page full of commands you can use with AltonBot', color=3447003)
+            HelpMsg = discord.Embed(title='Help Page', description='This is a page full of training commands you can use with AltonBot', color=3447003)
             HelpMsg.set_author(name='Insults Bot', icon_url=client.user.avatar_url)
             HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'trainingreminder [id]', value='**LD+ Only** - Sends a training reminder about the specified training.')
             HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'edittraining [id] [fieldtochange]: [valuetochangeto]', value='**LD+ Only** - edits training session specified **COMING SOON**')
@@ -248,14 +248,14 @@ async def on_message(message):
             HelpMsg.set_footer(icon_url=client.user.avatar_url, text='© Alton County Railways')
             await message.channel.send(embed=HelpMsg)
         elif messege.lower().startswith('help other'):
-            HelpMsg = discord.Embed(title='Help Page', description='This is a page full of commands you can use with AltonBot', color=3447003)
+            HelpMsg = discord.Embed(title='Help Page', description='This is a page full of other commands you can use with AltonBot', color=3447003)
             HelpMsg.set_author(name='Insults Bot', icon_url=client.user.avatar_url)
             HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'help', value='Displays a help page.')
             HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'prefix', value='Changes the prefix for commands')
             HelpMsg.set_footer(icon_url=client.user.avatar_url, text='© Alton County Railways')
             await message.channel.send(embed=HelpMsg)
         elif messege.startswith('help'):
-            HelpMsg + discord.Embed(title='Help Page', description='There are two types of commands you can use with AltonBot. \nPlease type ' + CMDPrefix.get(message.guild.id) + 'help [type] to see help for a certain type of command', color=3447003)
+            HelpMsg = discord.Embed(title='Help Page', description='There are two types of commands you can use with AltonBot. \nPlease type ' + CMDPrefix.get(message.guild.id) + 'help [type] to see help for a certain type of command', color=3447003)
             HelpMsg.set_author(name='Insults Bot', icon_url=client.user.avatar_url)
             HelpMsg.add_field(name='Moderation', value='This includes all the commands that warn, ban and kick users.')
             HelpMsg.add_field(name='Trainings', value='This includes all the commands that the bot can do in regards to trainings')
