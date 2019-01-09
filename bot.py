@@ -24,6 +24,7 @@ async def on_message(message):
     if message.author == client.user:
         return
     if message.content.startswith(CMDPrefix.get(message.guild.id) if message.guild.id in CMDPrefix else '!'):
+        await message.channel.trigger_typing()
         print('COMMAND DETECTED')
         messege = message.content[len(CMDPrefix.get(message.guild.id)):]
         if messege.startswith('hello'):
@@ -268,6 +269,7 @@ async def on_message(message):
                 exec(messege[11:], globals(), locals())
             else:
                 await message.channel.send('Sorry lucky962 is the only person who can run this command at this moment.')
+        
 
 @client.event
 async def on_reaction_add(reaction, user):
