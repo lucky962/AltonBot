@@ -93,11 +93,17 @@ async def on_message(message):
                             if parts[0] == warning[1][3:len(warning[1]) - 1]:
                                 noofwarns += 1
                         await message.channel.send((((warning[1] + ' has been warned for: ') + warning[2]) + '. This is warning number ') + str(noofwarns))
-                        await message.guild.get_member(int(warning[1][3:len(warning[1]) - 1])).send('You have been warned from Alton County Railways for: ' + warning[2])
+                        try:
+                            await message.guild.get_member(int(warning[1][3:len(warning[1]) - 1])).send('You have been warned from Alton County Railways for: ' + warning[2])
+                        except discord.errors.Forbidden:
+                            pass
                         if (noofwarns == 3) or (noofwarns == 6):
                             try:
                                 await message.channel.send(((warning[1] + ' will now be kicked for having ') + str(noofwarns)) + ' warnings.')
-                                await message.guild.get_member(int(warning[1][3:len(warning[1]) - 1])).send(('You have been kicked from Alton County Railways for having ' + str(noofwarns)) + ' warnings.')
+                                try:
+                                    await message.guild.get_member(int(warning[1][3:len(warning[1]) - 1])).send(('You have been kicked from Alton County Railways for having ' + str(noofwarns)) + ' warnings.')
+                                except discord.errors.Forbidden:
+                                    pass
                                 await message.guild.kick(message.guild.get_member(int(warning[1][3:len(warning[1]) - 1])), reason=str(noofwarns) + 'warnings')
                             except discord.errors.Forbidden:
                                 await message.channel.send("Sorry, I don't have the permissions to kick that user yet.")
@@ -116,11 +122,17 @@ async def on_message(message):
                             if parts[0] == warning[1][2:len(warning[1]) - 1]:
                                 noofwarns += 1
                         await message.channel.send((((warning[1] + ' has been warned for: ') + warning[2]) + '. This is warning number ') + str(noofwarns))
-                        await message.guild.get_member(int(warning[1][2:len(warning[1]) - 1])).send('You have been warned from Alton County Railways for: ' + warning[2])
+                        try:
+                            await message.guild.get_member(int(warning[1][2:len(warning[1]) - 1])).send('You have been warned from Alton County Railways for: ' + warning[2])
+                        except discord.errors.Forbidden:
+                            pass
                         if (noofwarns == 3) or (noofwarns == 6):
                             try:
                                 await message.channel.send(((warning[1] + ' will now be kicked for having ') + str(noofwarns)) + ' warnings.')
-                                await message.guild.get_member(int(warning[1][2:len(warning[1]) - 1])).send(('You have been kicked from Alton County Railways for having ' + str(noofwarns)) + ' warnings.')
+                                try:
+                                    await message.guild.get_member(int(warning[1][2:len(warning[1]) - 1])).send(('You have been kicked from Alton County Railways for having ' + str(noofwarns)) + ' warnings.')
+                                except discord.errors.Forbidden:
+                                    pass
                                 await message.guild.kick(message.guild.get_member(int(warning[1][2:len(warning[1]) - 1])), reason=str(noofwarns) + 'warnings')
                             except discord.errors.Forbidden:
                                 await message.channel.send("Sorry, I don't have the permissions to kick that user yet.")
@@ -139,11 +151,17 @@ async def on_message(message):
                             if parts[0] == warning[1]:
                                 noofwarns += 1
                         await message.channel.send((((('<@' + warning[1]) + '> has been warned for: ') + warning[2]) + '. This is warning number ') + str(noofwarns))
-                        await message.guild.get_member(int(warning[1])).send('You have been warned from Alton County Railways for: ' + warning[2])
+                        try:
+                            await message.guild.get_member(int(warning[1])).send('You have been warned from Alton County Railways for: ' + warning[2])
+                        except discord.errors.Forbidden:
+                            pass
                         if (noofwarns == 3) or (noofwarns == 6):
                             try:
                                 await message.channel.send(((('<@' + warning[1]) + '> will now be kicked for having ') + str(noofwarns)) + ' warnings.')
-                                await message.guild.get_member(int(warning[1])).send(('You have been kicked from Alton County Railways for having ' + str(noofwarns)) + ' warnings.')
+                                try:
+                                    await message.guild.get_member(int(warning[1])).send(('You have been kicked from Alton County Railways for having ' + str(noofwarns)) + ' warnings.')
+                                except discord.errors.Forbidden:
+                                    pass
                                 await message.guild.kick(message.guild.get_member(int(warning[1])), reason=str(noofwarns) + 'warnings')
                             except discord.errors.Forbidden:
                                 await message.channel.send("Sorry, I don't have the permissions to kick that user yet.")
