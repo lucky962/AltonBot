@@ -28,24 +28,6 @@ os.chdir('Dependencies')
 
 client = discord.Client()
 
-async def checktime():
-    sent = 0
-    await client.wait_until_ready()
-    while not client.is_closed:
-        if time.time() > 1546963560 and sent == 0:
-            sent = 1
-            await client.send_message(client.get_channel(noticechannel), """Attention <@&531531613562077184>, I will be hosting a Developer Training in 24 minutes/5:30 PM BST!
-Joining Time: 5:15 PM BST
-S-locking time: 5:28 PM BST
-Co-Host: No one.
-The link will be posted on the Group Wall and Group Shout, 16 minutes before it’s scheduled time. [5:14 PM BST]
-
-Once you join, please spawn as passenger at Standen and line on the platform.
-
-Thanks for understanding,
-uh_Denlons""")
-        await asyncio.sleep(1)
-
 @client.event
 async def on_message(message):
     print(message.author)
@@ -441,5 +423,4 @@ async def on_ready():
     print(client.user.id)
     print('------')
 
-client.loop.create_task(checktime())
 client.run(TOKEN)
