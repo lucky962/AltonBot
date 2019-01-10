@@ -284,6 +284,7 @@ async def on_message(message):
         elif messege.lower().startswith('help training'):
             HelpMsg = discord.Embed(title='Help Page', description='This is a page full of training commands you can use with AltonBot', color=3447003)
             HelpMsg.set_author(name='Insults Bot', icon_url=client.user.avatar_url)
+            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'nexttraining', value='Shows upcoming training sessions. **COMING SOON**')
             HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'trainingreminder [id]', value='**LD+ Only** - Sends a training reminder about the specified training.')
             HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'edittraining [id] [fieldtochange]: [valuetochangeto]', value='**LD+ Only** - edits training session specified **COMING SOON**')
             HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'deletetraining [id]', value='**LD+ Only** - deletes training session specified.')
