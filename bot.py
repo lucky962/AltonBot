@@ -10,7 +10,7 @@ from Dependencies.ServerPrefixes import *
 print(CMDPrefix)
 with open('BotToken.txt') as f:
     TOKEN = f.read()
-AltonDB = mysql.connector.connect(host='localhost', user='root', passwd='Password', database='AltonBot')
+AltonDB = mysql.connector.connect(host='192.168.0.100', user='root', passwd='Password', database='AltonBot')
 noticechannel = 520701561564037143
 requestchannel = 528528451192356874
 mycursor = AltonDB.cursor(buffered=True)
@@ -79,11 +79,26 @@ async def on_message(message):
             if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
                 trainingid = messege[15:]
                 mycursor.execute('SELECT * FROM trainingsessions')
-                mycursor.execute('DELETE FROM `trainingsessions` WHERE `trainingsessions`.`ID` = ' + trainingid)
+                mycursor.execute('DELETE FROM `trainingsessions` WHERE `ID` = ' + trainingid)
                 AltonDB.commit()
                 await message.channel.send('Successfully deleted ' + str(mycursor.rowcount) + ' training session(s)')
         elif messege.startswith('nexttraining'):
-            await message.channel.send('This command is coming soon, stay tuned!')
+            IDtrainings = []
+            POtrainings = []
+            mycursor.execute('SELECT * FROM trainingsessions')
+            mycursor.execute('DELETE FROM `trainingsessions` WHERE `TrainingTime` < "' + str(datetime.datetime.now()) + '"')
+            AltonDB.commit()
+            mycursor.execute("SELECT * FROM `trainingsessions` WHERE `TrainingType` = 'Intermediate Driver Training' ORDER BY `trainingsessions`.`TrainingTime` ASC")
+            IDtrainings = mycursor.fetchall()
+            mycursor.execute("SELECT * FROM `trainingsessions` WHERE `TrainingType` = 'Platform Operator Training'")
+            POtrainings = mycursor.fetchall()
+            nexttrainingmsg = ['**UPCOMING ED TRAININGS**']
+            for row in IDtrainings:
+                nexttrainingmsg.append(row[2].strftime('%d/%m/%Y at %I:%M %p. Hosted by: ') + row[3])
+            nexttrainingmsg.append('**UPCOMING PO TRAININGS**')
+            for row in POtrainings:
+                nexttrainingmsg.append(row[2].strftime('%d/%m/%Y at %I:%M %p. Hosted by: ') + row[3])
+            await message.channel.send('\n'.join(nexttrainingmsg))
         elif messege.startswith('warn '):
             roles = []
             for i in message.author.roles:
@@ -285,7 +300,7 @@ async def on_message(message):
         elif messege.lower().startswith('help training'):
             HelpMsg = discord.Embed(title='Help Page', description='This is a page full of training commands you can use with AltonBot', color=3447003)
             HelpMsg.set_author(name='Alton Bot', icon_url=client.user.avatar_url)
-            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'nexttraining', value='Shows upcoming training sessions. **COMING SOON**')
+            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'nexttraining', value='Shows upcoming training sessions.')
             HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'trainingreminder [id]', value='**LD+ Only** - Sends a training reminder about the specified training.')
             HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'edittraining [id] [fieldtochange]: [valuetochangeto]', value='**LD+ Only** - edits training session specified **COMING SOON**')
             HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'deletetraining [id]', value='**LD+ Only** - deletes training session specified.')
