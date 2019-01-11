@@ -306,7 +306,6 @@ async def on_message(message):
             HelpMsg.add_field(name='Other', value='This includes any other commands that AltonBot can do')
             HelpMsg.set_footer(icon_url=client.user.avatar_url, text='© Alton County Railways')
             await message.channel.send(embed=HelpMsg)
-
         elif messege.startswith('prefix'):
             if len(messege) < 8:
                 await message.channel.send('Your prefix has been set to the default(!) from ' + CMDPrefix.get(message.guild.id))
