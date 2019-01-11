@@ -86,7 +86,7 @@ async def on_message(message):
             IDtrainings = []
             POtrainings = []
             mycursor.execute('SELECT * FROM trainingsessions')
-            mycursor.execute('DELETE FROM `trainingsessions` WHERE `TrainingTime` < "' + str(datetime.datetime.now()) + '"')
+            mycursor.execute('DELETE FROM `trainingsessions` WHERE `TrainingTime` < "' + str(datetime.datetime.now() - datetime.timedelta(hours=11)) + '"')
             AltonDB.commit()
             mycursor.execute("SELECT * FROM `trainingsessions` WHERE `TrainingType` = 'Intermediate Driver Training' ORDER BY `trainingsessions`.`TrainingTime` ASC")
             IDtrainings = mycursor.fetchall()
