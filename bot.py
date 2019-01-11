@@ -82,7 +82,8 @@ async def on_message(message):
                 mycursor.execute('DELETE FROM `trainingsessions` WHERE `trainingsessions`.`ID` = ' + trainingid)
                 AltonDB.commit()
                 await message.channel.send('Successfully deleted ' + str(mycursor.rowcount) + ' training session(s)')
-                
+        elif messege.startswith('nexttraining'):
+            await message.channel.send('This command is coming soon, stay tuned!')
         elif messege.startswith('warn '):
             roles = []
             for i in message.author.roles:
