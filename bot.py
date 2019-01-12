@@ -159,7 +159,7 @@ async def on_message(message):
             for i in message.author.roles:
                 roles.append(i.name)
             if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
-                mycursor.execute("SELECT * FROM `warnlist`")
+                mycursor.execute("SELECT * FROM `warnlist` ORDER BY `warnlist`.`Warned` ASC")
                 warnings  = mycursor.fetchall()
                 for row in warnings:
                     try:
