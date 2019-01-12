@@ -156,10 +156,13 @@ async def on_message(message):
         elif messege.startswith('warnings'):
             roles = []
             msg = []
+            search = ''
+            if len(messege) > 9:
+                search = " WHERE `Warned` = " + tagtoid(messege[9:])
             for i in message.author.roles:
                 roles.append(i.name)
             if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
-                mycursor.execute("SELECT * FROM `warnlist` ORDER BY `warnlist`.`Warned` ASC")
+                mycursor.execute("SELECT * FROM `warnlist`" + search + " ORDER BY `warnlist`.`Warned` ASC")
                 warnings  = mycursor.fetchall()
                 for row in warnings:
                     try:
@@ -207,7 +210,7 @@ async def on_message(message):
             HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'warn [user]', value='**LD+ Only** - warns a user')
             HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'kick [user]', value='**LD+ Only** - kicks a user')
             HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'ban [user] [time]', value='**MOD+ Only** - bans a user indefinetely or for a certain time. **COMING SOON**')
-            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'warnings', value='Displays all warnings currently stored in memory.')
+            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'warnings [user(optional)]', value='Displays all warnings currently stored in memory or just for the user.')
             HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'clearwarnings [user]', value='**LD+ Only** - clears the warnings of a certain player.')
             HelpMsg.set_footer(icon_url=client.user.avatar_url, text='© Alton County Railways')
             await message.channel.send(embed=HelpMsg)
