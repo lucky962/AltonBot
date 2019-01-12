@@ -17,6 +17,9 @@ mycursor = AltonDB.cursor(buffered=True)
 os.chdir('Dependencies')
 client = discord.Client()
 
+def tagtoid(tag):
+    return(tag.lstrip('<@!').lstrip('<@').rstrip('>'))
+
 @client.event
 async def on_message(message):
     print(message.author)
@@ -106,95 +109,35 @@ async def on_message(message):
             print(roles)
             if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
                 warning = messege.split(' ', maxsplit=2)
+                warning[1] = tagtoid(warning[1])
                 try:
-                    if messege[5:].startswith('<@!'):
-                        with open('warnlist.txt', 'r') as f:
-                            warnings = f.readlines()
-                        noofwarns = 1
-                        for i in warnings:
-                            parts = i.split(' ', maxsplit=2)
-                            print(parts[0])
-                            print(warning[1][3:len(warning[1]) - 1])
-                            if parts[0] == warning[1][3:len(warning[1]) - 1]:
-                                noofwarns += 1
-                        await message.channel.send((((warning[1] + ' has been warned for: ') + warning[2]) + '. This is warning number ') + str(noofwarns))
+                    with open('warnlist.txt', 'r') as f:
+                        warnings = f.readlines()
+                    noofwarns = 1
+                    for i in warnings:
+                        parts = i.split(' ', maxsplit=2)
+                        if parts[0] == warning[1]:
+                            noofwarns += 1
+                    await message.channel.send((((('<@' + warning[1]) + '> has been warned for: ') + warning[2]) + '. This is warning number ') + str(noofwarns))
+                    try:
+                        await message.guild.get_member(int(warning[1])).send('You have been warned from Alton County Railways for: ' + warning[2])
+                    except discord.errors.Forbidden:
+                        pass
+                    if (noofwarns == 3) or (noofwarns == 6):
                         try:
-                            await message.guild.get_member(int(warning[1][3:len(warning[1]) - 1])).send('You have been warned from Alton County Railways for: ' + warning[2])
-                        except discord.errors.Forbidden:
-                            pass
-                        if (noofwarns == 3) or (noofwarns == 6):
+                            await message.channel.send(((('<@' + warning[1]) + '> will now be kicked for having ') + str(noofwarns)) + ' warnings.')
                             try:
-                                await message.channel.send(((warning[1] + ' will now be kicked for having ') + str(noofwarns)) + ' warnings.')
-                                try:
-                                    await message.guild.get_member(int(warning[1][3:len(warning[1]) - 1])).send(('You have been kicked from Alton County Railways for having ' + str(noofwarns)) + ' warnings.')
-                                except discord.errors.Forbidden:
-                                    pass
-                                await message.guild.kick(message.guild.get_member(int(warning[1][3:len(warning[1]) - 1])), reason=str(noofwarns) + ' warnings')
+                                await message.guild.get_member(int(warning[1])).send(('You have been kicked from Alton County Railways for having ' + str(noofwarns)) + ' warnings.')
                             except discord.errors.Forbidden:
-                                await message.channel.send("Sorry, I don't have the permissions to kick that user yet.")
-                        with open('warnlist.txt', 'r') as f:
-                            warnings = f.readlines()
-                        warnings.append(((((warning[1][3:len(warning[1]) - 1] + ' ') + str(message.author.id)) + ' ') + warning[2]) + '\n')
-                        with open('warnlist.txt', 'w') as f:
-                            for i in warnings:
-                                f.write(i)
-                    elif messege[5:].startswith('<@'):
-                        with open('warnlist.txt', 'r') as f:
-                            warnings = f.readlines()
-                        noofwarns = 1
+                                pass
+                            await message.guild.kick(message.guild.get_member(int(warning[1])), reason=str(noofwarns) + ' warnings')
+                        except discord.errors.Forbidden:
+                            await message.channel.send("Sorry, I don't have the permissions to kick that user yet.")
+                    with open('warnlist.txt', 'r') as f:
+                        warnings = f.readlines()
+                    warnings.append(((((warning[1] + ' ') + str(message.author.id)) + ' ') + warning[2]) + '\n')
+                    with open('warnlist.txt', 'w') as f:
                         for i in warnings:
-                            parts = i.split(' ', maxsplit=2)
-                            if parts[0] == warning[1][2:len(warning[1]) - 1]:
-                                noofwarns += 1
-                        await message.channel.send((((warning[1] + ' has been warned for: ') + warning[2]) + '. This is warning number ') + str(noofwarns))
-                        try:
-                            await message.guild.get_member(int(warning[1][2:len(warning[1]) - 1])).send('You have been warned from Alton County Railways for: ' + warning[2])
-                        except discord.errors.Forbidden:
-                            pass
-                        if (noofwarns == 3) or (noofwarns == 6):
-                            try:
-                                await message.channel.send(((warning[1] + ' will now be kicked for having ') + str(noofwarns)) + ' warnings.')
-                                try:
-                                    await message.guild.get_member(int(warning[1][2:len(warning[1]) - 1])).send(('You have been kicked from Alton County Railways for having ' + str(noofwarns)) + ' warnings.')
-                                except discord.errors.Forbidden:
-                                    pass
-                                await message.guild.kick(message.guild.get_member(int(warning[1][2:len(warning[1]) - 1])), reason=str(noofwarns) + ' warnings')
-                            except discord.errors.Forbidden:
-                                await message.channel.send("Sorry, I don't have the permissions to kick that user yet.")
-                        with open('warnlist.txt', 'r') as f:
-                            warnings = f.readlines()
-                        warnings.append(((((warning[1][2:len(warning[1]) - 1] + ' ') + str(message.author.id)) + ' ') + warning[2]) + '\n')
-                        with open('warnlist.txt', 'w') as f:
-                            for i in warnings:
-                                f.write(i)
-                    else:
-                        with open('warnlist.txt', 'r') as f:
-                            warnings = f.readlines()
-                        noofwarns = 1
-                        for i in warnings:
-                            parts = i.split(' ', maxsplit=2)
-                            if parts[0] == warning[1]:
-                                noofwarns += 1
-                        await message.channel.send((((('<@' + warning[1]) + '> has been warned for: ') + warning[2]) + '. This is warning number ') + str(noofwarns))
-                        try:
-                            await message.guild.get_member(int(warning[1])).send('You have been warned from Alton County Railways for: ' + warning[2])
-                        except discord.errors.Forbidden:
-                            pass
-                        if (noofwarns == 3) or (noofwarns == 6):
-                            try:
-                                await message.channel.send(((('<@' + warning[1]) + '> will now be kicked for having ') + str(noofwarns)) + ' warnings.')
-                                try:
-                                    await message.guild.get_member(int(warning[1])).send(('You have been kicked from Alton County Railways for having ' + str(noofwarns)) + ' warnings.')
-                                except discord.errors.Forbidden:
-                                    pass
-                                await message.guild.kick(message.guild.get_member(int(warning[1])), reason=str(noofwarns) + ' warnings')
-                            except discord.errors.Forbidden:
-                                await message.channel.send("Sorry, I don't have the permissions to kick that user yet.")
-                        with open('warnlist.txt', 'r') as f:
-                            warnings = f.readlines()
-                        warnings.append(((((warning[1] + ' ') + str(message.author.id)) + ' ') + warning[2]) + '\n')
-                        with open('warnlist.txt', 'w') as f:
-                            for i in warnings:
                                 f.write(i)
                 except IndexError:
                     await message.channel.send('A reason is needed to issue a warning.')
@@ -208,27 +151,13 @@ async def on_message(message):
             if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
                 kickinfo = messege.split(' ', maxsplit=2)
                 try:
-                    if messege[5:].startswith('<@!'):
-                        await message.channel.send(((kickinfo[1] + ' has been kicked for: ') + kickinfo[2]) + '.')
-                        try:
-                            await message.guild.get_member(int(kickinfo[1][3:len(kickinfo[1]) - 1])).send('You have been kicked from Alton County Railways for: ' + kickinfo[2])
-                        except discord.errors.Forbidden:
-                            pass
-                        await message.guild.kick(message.guild.get_member(int(kickinfo[1][3:len(kickinfo[1]) - 1])), reason=kickinfo[2])
-                    elif messege[5:].startswith('<@'):
-                        await message.channel.send(((kickinfo[1] + ' has been kicked for: ') + kickinfo[2]) + '.')
-                        try:
-                            await message.guild.get_member(int(kickinfo[1][2:len(kickinfo[1]) - 1])).send('You have been kicked from Alton County Railways for: ' + kickinfo[2])
-                        except discord.errors.Forbidden:
-                            pass
-                        await message.guild.kick(message.guild.get_member(int(kickinfo[1][2:len(kickinfo[1]) - 1])), reason=kickinfo[2])
-                    else:
-                        await message.channel.send(((('<@' + kickinfo[1]) + '> has been kicked for: ') + kickinfo[2]) + '.')
-                        try:
-                            await message.guild.get_member(int(kickinfo[1])).send('You have been kicked from Alton County Railways for: ' + kickinfo[2])
-                        except discord.errors.Forbidden:
-                            pass
-                        await message.guild.kick(message.guild.get_member(int(kickinfo[1], reason=kickinfo[2])))
+                    kickinfo[1] = tagtoid(kickinfo[1])
+                    await message.channel.send(((('<@' + kickinfo[1]) + '> has been kicked for: ') + kickinfo[2]) + '.')
+                    try:
+                        await message.guild.get_member(int(kickinfo[1])).send('You have been kicked from Alton County Railways for: ' + kickinfo[2])
+                    except discord.errors.Forbidden:
+                        pass
+                    await message.guild.kick(message.guild.get_member(int(kickinfo[1])), reason=kickinfo[2])
                 except discord.errors.Forbidden:
                     await message.channel.send('I do not have permission to kick this user.')
                 except IndexError:
@@ -265,22 +194,17 @@ async def on_message(message):
             for i in message.author.roles:
                 roles.append(i.name)
             if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
+                part[1] = tagtoid(part[1])
                 with open('warnlist.txt', 'r') as f:
                     warnings = f.readlines()
-                if messege[14:].startswith('<@!'):
-                    for i in warnings[:]:
-                        if i.startswith(part[1][3:len(part[1]) - 1]):
-                            warnings.remove(i)
-                    await message.channel.send('Successfully cleared warnings for ' + message.guild.get_member(int(part[1][3:len(part[1]) - 1])).nick)
-                elif messege[14:].startswith('<@'):
-                    for i in warnings[:]:
-                        if i.startswith(part[1][2:len(part[1]) - 1]):
-                            warnings.remove(i)
-                    await message.channel.send('Successfully cleared warnings for ' + message.guild.get_member(int(part[1][2:len(part[1]) - 1])).nick)
-                else:
-                    for i in warnings[:]:
-                        if i.startswithint(part[1]):
-                            warnings.remove(i)
+                for i in warnings[:]:
+                    if i.startswith(part[1]):
+                        warnings.remove(i)
+                nickname = message.guild.get_member(int(part[1])).nick
+                if nickname == None:
+                    nickname = await client.get_user_info(int(part[1]))
+                    nickname = nickname.name
+                await message.channel.send('Successfully cleared warnings for ' + nickname)
                 with open('warnlist.txt', 'w') as f:
                     f.write(''.join(warnings))
             else:
@@ -345,7 +269,7 @@ async def on_message(message):
             await client.change_presence(activity=discord.Game(name=(CMDPrefix.get(514155943525875716) if 514155943525875716 in CMDPrefix else '!') + 'help'))
         elif messege.startswith('rawcommand'):
             if message.author.id == 244596682531143680:
-                exec(messege[11:], globals(), locals())
+                exec(messege[11:])
             else:
                 await message.channel.send('Sorry lucky962 is the only person who can run this command at this moment.')
         
