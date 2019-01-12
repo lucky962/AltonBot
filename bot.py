@@ -10,7 +10,7 @@ from Dependencies.ServerPrefixes import *
 print(CMDPrefix)
 with open('BotToken.txt') as f:
     TOKEN = f.read()
-AltonDB = mysql.connector.connect(host='localhost', user='root', passwd='Password', database='AltonBot')
+AltonDB = mysql.connector.connect(host='192.168.0.100', user='root', passwd='Password', database='AltonBot')
 noticechannel = 520701561564037143
 requestchannel = 528528451192356874
 mycursor = AltonDB.cursor(buffered=True)
@@ -163,14 +163,14 @@ async def on_message(message):
                 warnings  = mycursor.fetchall()
                 for row in warnings:
                     try:
-                        warned = message.guild.get_member(int(row[0]).nick)
+                        warned = message.guild.get_member(int(row[0])).nick
                         if warned == None:
                             raise AttributeError()
                     except AttributeError:
                         warned = await client.get_user_info(int(row[0]))
                         warned = warned.name
                     try:
-                        warner = message.guild.get_member(int(row[1]).nick)
+                        warner = message.guild.get_member(int(row[1])).nick
                         if warner == None:
                             raise AttributeError()
                     except AttributeError:
