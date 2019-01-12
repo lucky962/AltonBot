@@ -111,13 +111,9 @@ async def on_message(message):
                 warning = messege.split(' ', maxsplit=2)
                 warning[1] = tagtoid(warning[1])
                 try:
-                    with open('warnlist.txt', 'r') as f:
-                        warnings = f.readlines()
-                    noofwarns = 1
-                    for i in warnings:
-                        parts = i.split(' ', maxsplit=2)
-                        if parts[0] == warning[1]:
-                            noofwarns += 1
+                    mycursor.execute("INSERT INTO warnlist (Warned, Warner, Reason) VALUES ('" + warning[1] + "', '" + str(message.author.id) + "', '" + warning[2] + "');")
+                    AltonDB.commit()
+                    noofwarns = mycursor.execute("SELECT * FROM `warnlist` WHERE `Warned` = '" + warning[1] + "'")
                     await message.channel.send((((('<@' + warning[1]) + '> has been warned for: ') + warning[2]) + '. This is warning number ') + str(noofwarns))
                     try:
                         await message.guild.get_member(int(warning[1])).send('You have been warned from Alton County Railways for: ' + warning[2])
@@ -133,12 +129,6 @@ async def on_message(message):
                             await message.guild.kick(message.guild.get_member(int(warning[1])), reason=str(noofwarns) + ' warnings')
                         except discord.errors.Forbidden:
                             await message.channel.send("Sorry, I don't have the permissions to kick that user yet.")
-                    with open('warnlist.txt', 'r') as f:
-                        warnings = f.readlines()
-                    warnings.append(((((warning[1] + ' ') + str(message.author.id)) + ' ') + warning[2]) + '\n')
-                    with open('warnlist.txt', 'w') as f:
-                        for i in warnings:
-                                f.write(i)
                 except IndexError:
                     await message.channel.send('A reason is needed to issue a warning.')
             else:
