@@ -159,24 +159,25 @@ async def on_message(message):
             for i in message.author.roles:
                 roles.append(i.name)
             if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
-                with open('warnlist.txt', 'r') as f:
-                    warnings = f.readlines()
-                for i in warnings:
-                    parts = i.split(' ', maxsplit=2)
-                    print(parts)
+                mycursor.execute("SELECT * FROM `warnlist`")
+                warnings  = mycursor.fetchall()
+                for row in warnings:
                     try:
-                        msg.append((((('*' + str(message.guild.get_member(int(parts[0])).nick)) + '* was warned by *') + str(message.guild.get_member(int(parts[1])).nick)) + '* for reason: ') + parts[2])
+                        warned = message.guild.get_member(int(row[0]).nick)
+                        if warned == None:
+                            raise AttributeError()
                     except AttributeError:
-                        try:
-                            user0 = await client.get_user_info(int(parts[0]))
-                            msg.append('*' + user0.name + '* was warned by *' + str(message.guild.get_member(int(parts[1])).nick) + '* for reason: ' + parts[2])
-                        except AttributeError:
-                            try:
-                                user1 = await client.get_user_info((int(parts[1])))
-                                msg.append('*' + str(message.guild.get_member(int(parts[0])).nick) + '* was warned by *' + user1.name + '* for reason: ' + parts[2])
-                            except AttributeError:
-                                msg.append('*' + user0.name + '* was warned by *' + user1.name + '* for reason: ' + parts[2])
-                await message.channel.send(''.join(msg))
+                        warned = await client.get_user_info(int(row[0]))
+                        warned = warned.name
+                    try:
+                        warner = message.guild.get_member(int(row[1]).nick)
+                        if warner == None:
+                            raise AttributeError()
+                    except AttributeError:
+                        warner = await client.get_user_info(int(row[1]))
+                        warner = warner.name
+                    msg.append('*' + warned + '* was warned by *' + warner + '* for reason: ' + row[2])
+                await message.channel.send('\n'.join(msg))
         elif messege.startswith('clearwarn'):
             part = message.content.split(' ')
             roles = []
