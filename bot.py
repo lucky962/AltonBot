@@ -17,8 +17,12 @@ mycursor = AltonDB.cursor(buffered=True)
 os.chdir('Dependencies')
 client = discord.Client()
 
-def tagtoid(tag): # Changes discord tag to id
-    return(tag.lstrip('<@!').lstrip('<@').rstrip('>'))
+def tagtoid(tag, message): # Changes discord tag to id
+    try:
+        isd = int(tag.lstrip('<@!').lstrip('<@').rstrip('>'))
+        return (str(isd))
+    except ValueError:
+        return(message.guild.get_member_named(tag).id)
 
 @client.event
 async def on_message(message):
@@ -107,7 +111,7 @@ async def on_message(message):
             print(roles)
             if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
                 warning = messege.split(' ', maxsplit=2)
-                warning[1] = tagtoid(warning[1])
+                warning[1] = tagtoid(warning[1], message)
                 try:
                     mycursor.execute("INSERT INTO warnlist (Warned, Warner, Reason) VALUES ('" + warning[1] + "', '" + str(message.author.id) + "', '" + warning[2] + "');")
                     AltonDB.commit()
@@ -140,7 +144,7 @@ async def on_message(message):
             if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
                 kickinfo = messege.split(' ', maxsplit=2)
                 try:
-                    kickinfo[1] = tagtoid(kickinfo[1])
+                    kickinfo[1] = tagtoid(kickinfo[1], message)
                     await message.channel.send(((('<@' + kickinfo[1]) + '> has been kicked for: ') + kickinfo[2]) + '.')
                     try:
                         await message.guild.get_member(int(kickinfo[1])).send('You have been kicked from Alton County Railways for: ' + kickinfo[2])
@@ -158,7 +162,7 @@ async def on_message(message):
             msg = []
             search = ''
             if len(messege) > 9:
-                search = " WHERE `Warned` = " + tagtoid(messege[9:])
+                search = " WHERE `Warned` = " + tagtoid(messege[9:], message)
             for i in message.author.roles:
                 roles.append(i.name)
             if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
@@ -187,7 +191,7 @@ async def on_message(message):
             for i in message.author.roles:
                 roles.append(i.name)
             if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
-                part[1] = tagtoid(part[1])
+                part[1] = tagtoid(part[1], message)
                 mycursor.execute("DELETE FROM `warnlist` WHERE `warned` = '" + part[1] + "'")
                 noofwarns = mycursor.rowcount
                 AltonDB.commit()
