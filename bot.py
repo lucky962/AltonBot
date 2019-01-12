@@ -163,20 +163,20 @@ async def on_message(message):
                 warnings  = mycursor.fetchall()
                 for row in warnings:
                     try:
-                        warned = message.guild.get_member(int(row[0])).nick
+                        warned = message.guild.get_member(int(row[1])).nick
                         if warned == None:
                             raise AttributeError()
                     except AttributeError:
-                        warned = await client.get_user_info(int(row[0]))
+                        warned = await client.get_user_info(int(row[1]))
                         warned = warned.name
                     try:
-                        warner = message.guild.get_member(int(row[1])).nick
+                        warner = message.guild.get_member(int(row[2])).nick
                         if warner == None:
                             raise AttributeError()
                     except AttributeError:
-                        warner = await client.get_user_info(int(row[1]))
+                        warner = await client.get_user_info(int(row[2]))
                         warner = warner.name
-                    msg.append('*' + warned + '* was warned by *' + warner + '* for reason: ' + row[2])
+                    msg.append('*' + warned + '* was warned by *' + warner + '* for reason: ' + row[3])
                 await message.channel.send('\n'.join(msg))
         elif messege.startswith('clearwarn'):
             part = message.content.split(' ')
