@@ -17,7 +17,7 @@ mycursor = AltonDB.cursor(buffered=True)
 os.chdir('Dependencies')
 client = discord.Client()
 
-def tagtoid(tag):
+def tagtoid(tag): # Changes discord tag to id
     return(tag.lstrip('<@!').lstrip('<@').rstrip('>'))
 
 @client.event
