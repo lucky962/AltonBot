@@ -10,7 +10,7 @@ from Dependencies.ServerPrefixes import *
 print(CMDPrefix)
 with open('BotToken.txt') as f:
     TOKEN = f.read()
-AltonDB = mysql.connector.connect(host='localhost', user='root', passwd='Password', database='AltonBot')
+AltonDB = mysql.connector.connect(host='192.168.0.100', user='root', passwd='Password', database='AltonBot')
 noticechannel = 520701561564037143
 requestchannel = 528528451192356874
 mycursor = AltonDB.cursor(buffered=True)
@@ -113,7 +113,8 @@ async def on_message(message):
                 try:
                     mycursor.execute("INSERT INTO warnlist (Warned, Warner, Reason) VALUES ('" + warning[1] + "', '" + str(message.author.id) + "', '" + warning[2] + "');")
                     AltonDB.commit()
-                    noofwarns = mycursor.execute("SELECT * FROM `warnlist` WHERE `Warned` = '" + warning[1] + "'")
+                    mycursor.execute("SELECT * FROM `warnlist` WHERE `Warned` = '" + warning[1] + "'")
+                    noofwarns = mycursor.rowcount
                     await message.channel.send((((('<@' + warning[1]) + '> has been warned for: ') + warning[2]) + '. This is warning number ') + str(noofwarns))
                     try:
                         await message.guild.get_member(int(warning[1])).send('You have been warned from Alton County Railways for: ' + warning[2])
