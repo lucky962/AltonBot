@@ -81,14 +81,12 @@ async def on_message(message):
             print(roles)
             if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
                 trainingid = messege[15:]
-                mycursor.execute('SELECT * FROM trainingsessions')
                 mycursor.execute('DELETE FROM `trainingsessions` WHERE `ID` = ' + trainingid)
                 AltonDB.commit()
                 await message.channel.send('Successfully deleted ' + str(mycursor.rowcount) + ' training session(s)')
         elif messege.startswith('nexttraining'):
             IDtrainings = []
             POtrainings = []
-            mycursor.execute('SELECT * FROM trainingsessions')
             mycursor.execute('DELETE FROM `trainingsessions` WHERE `TrainingTime` < "' + str(datetime.datetime.now() - datetime.timedelta(hours=11)) + '"')
             AltonDB.commit()
             mycursor.execute("SELECT * FROM `trainingsessions` WHERE `TrainingType` = 'Intermediate Driver Training' ORDER BY `trainingsessions`.`TrainingTime` ASC")
@@ -111,13 +109,10 @@ async def on_message(message):
                 warning = messege.split(' ', maxsplit=2)
                 warning[1] = tagtoid(warning[1])
                 try:
-                    with open('warnlist.txt', 'r') as f:
-                        warnings = f.readlines()
-                    noofwarns = 1
-                    for i in warnings:
-                        parts = i.split(' ', maxsplit=2)
-                        if parts[0] == warning[1]:
-                            noofwarns += 1
+                    mycursor.execute("INSERT INTO warnlist (Warned, Warner, Reason) VALUES ('" + warning[1] + "', '" + str(message.author.id) + "', '" + warning[2] + "');")
+                    AltonDB.commit()
+                    mycursor.execute("SELECT * FROM `warnlist` WHERE `Warned` = '" + warning[1] + "'")
+                    noofwarns = mycursor.rowcount
                     await message.channel.send((((('<@' + warning[1]) + '> has been warned for: ') + warning[2]) + '. This is warning number ') + str(noofwarns))
                     try:
                         await message.guild.get_member(int(warning[1])).send('You have been warned from Alton County Railways for: ' + warning[2])
@@ -133,12 +128,6 @@ async def on_message(message):
                             await message.guild.kick(message.guild.get_member(int(warning[1])), reason=str(noofwarns) + ' warnings')
                         except discord.errors.Forbidden:
                             await message.channel.send("Sorry, I don't have the permissions to kick that user yet.")
-                    with open('warnlist.txt', 'r') as f:
-                        warnings = f.readlines()
-                    warnings.append(((((warning[1] + ' ') + str(message.author.id)) + ' ') + warning[2]) + '\n')
-                    with open('warnlist.txt', 'w') as f:
-                        for i in warnings:
-                                f.write(i)
                 except IndexError:
                     await message.channel.send('A reason is needed to issue a warning.')
             else:
@@ -170,43 +159,44 @@ async def on_message(message):
             for i in message.author.roles:
                 roles.append(i.name)
             if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
-                with open('warnlist.txt', 'r') as f:
-                    warnings = f.readlines()
-                for i in warnings:
-                    parts = i.split(' ', maxsplit=2)
-                    print(parts)
+                mycursor.execute("SELECT * FROM `warnlist`")
+                warnings  = mycursor.fetchall()
+                for row in warnings:
                     try:
-                        msg.append((((('*' + str(message.guild.get_member(int(parts[0])).nick)) + '* was warned by *') + str(message.guild.get_member(int(parts[1])).nick)) + '* for reason: ') + parts[2])
+                        warned = message.guild.get_member(int(row[0]).nick)
+                        if warned == None:
+                            raise AttributeError()
                     except AttributeError:
-                        try:
-                            user0 = await client.get_user_info(int(parts[0]))
-                            msg.append('*' + user0.name + '* was warned by *' + str(message.guild.get_member(int(parts[1])).nick) + '* for reason: ' + parts[2])
-                        except AttributeError:
-                            try:
-                                user1 = await client.get_user_info((int(parts[1])))
-                                msg.append('*' + str(message.guild.get_member(int(parts[0])).nick) + '* was warned by *' + user1.name + '* for reason: ' + parts[2])
-                            except AttributeError:
-                                msg.append('*' + user0.name + '* was warned by *' + user1.name + '* for reason: ' + parts[2])
-                await message.channel.send(''.join(msg))
-        elif messege.startswith('clearwarnings'):
+                        warned = await client.get_user_info(int(row[0]))
+                        warned = warned.name
+                    try:
+                        warner = message.guild.get_member(int(row[1]).nick)
+                        if warner == None:
+                            raise AttributeError()
+                    except AttributeError:
+                        warner = await client.get_user_info(int(row[1]))
+                        warner = warner.name
+                    msg.append('*' + warned + '* was warned by *' + warner + '* for reason: ' + row[2])
+                await message.channel.send('\n'.join(msg))
+        elif messege.startswith('clearwarn'):
             part = message.content.split(' ')
             roles = []
             for i in message.author.roles:
                 roles.append(i.name)
             if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
                 part[1] = tagtoid(part[1])
-                with open('warnlist.txt', 'r') as f:
-                    warnings = f.readlines()
-                for i in warnings[:]:
-                    if i.startswith(part[1]):
-                        warnings.remove(i)
-                nickname = message.guild.get_member(int(part[1])).nick
+                mycursor.execute("DELETE FROM `warnlist` WHERE `warned` = '" + part[1] + "'")
+                noofwarns = mycursor.rowcount
+                AltonDB.commit()
+                try:
+                    nickname = message.guild.get_member(int(part[1])).nick
+                except AttributeError:
+                    nickname = await client.get_user_info(int(part[1]))
+                    nickname = nickname.name
                 if nickname == None:
                     nickname = await client.get_user_info(int(part[1]))
                     nickname = nickname.name
-                await message.channel.send('Successfully cleared warnings for ' + nickname)
-                with open('warnlist.txt', 'w') as f:
-                    f.write(''.join(warnings))
+                await message.channel.send('Successfully cleared ' + str(noofwarns) + ' warnings for ' + nickname)
             else:
                 await message.channel.send('You have to be an LD+ to clear warnings.')
         elif messege.lower().startswith('ldappresponse'):
