@@ -99,7 +99,7 @@ async def on_message(message):
             IDtrainings = mycursor.fetchall()
             mycursor.execute("SELECT * FROM `trainingsessions` WHERE `TrainingType` = 'Platform Operator Training'")
             POtrainings = mycursor.fetchall()
-            nexttrainingmsg = ['**UPCOMING ED TRAININGS**']
+            nexttrainingmsg = ['**UPCOMING ID TRAININGS**']
             for row in IDtrainings:
                 nexttrainingmsg.append(row[2].strftime('%d/%m/%Y at %I:%M %p. Hosted by: ') + row[3])
             nexttrainingmsg.append('**UPCOMING PO TRAININGS**')
