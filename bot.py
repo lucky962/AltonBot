@@ -88,6 +88,8 @@ async def on_message(message):
                 mycursor.execute('DELETE FROM `trainingsessions` WHERE `ID` = ' + trainingid)
                 AltonDB.commit()
                 await message.channel.send('Successfully deleted ' + str(mycursor.rowcount) + ' training session(s)')
+        elif messege.startswith('edittraining'):
+            await message.channel.send('Edittraining command coming soon! Watch out for it!!')
         elif messege.startswith('nexttraining'):
             IDtrainings = []
             POtrainings = []
