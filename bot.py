@@ -89,22 +89,28 @@ async def on_message(message):
                 AltonDB.commit()
                 await message.channel.send('Successfully deleted ' + str(mycursor.rowcount) + ' training session(s)')
         elif messege.startswith('edittraining'):
-            await message.channel.send('Edittraining command coming soon! Watch out for it!!')
+            await message.channel.send('Edittraining command still in early development, there may be a few bugs!')
             trainingid = (messege.split(' '))[1]
             part = message.content.split(':')
             newinfo = part[1].strip(' ')
             if 'co-host' in messege.lower() or 'cohost' in message.lower():
                 mycursor.execute("UPDATE `trainingsessions` SET `Cohost` = '" + newinfo + "' WHERE `trainingsessions`.`ID` = " + trainingid + ";")
+                AltonDB.commit()
+                await message.channel.send('Successfully updated Co-host to ' + newinfo)
             elif 'host' in messege.lower():
                 mycursor.execute("UPDATE `trainingsessions` SET `Host` = '" + newinfo + "' WHERE `trainingsessions`.`ID` = " + trainingid + ";")
+                AltonDB.commit()
+                await message.channel.send('Successfully updated Host to ' + newinfo)
             elif 'type' in messege.lower():
                 if ('Dispatch' in trainingtype) or ('DS' in trainingtype) or ('Platform' in trainingtype) or ('PO' in trainingtype):
                     newinfo = 'Platform Operator Training'
                 elif ('Experience' in trainingtype) or ('ED' in trainingtype) or ('Intermediate' in trainingtype) or ('ID' in trainingtype):
                     newinfo = 'Intermediate Driver Training'
                 else:
-                    await message.channel.send('Training type not recognised')
+                    await message.channel.send('Training type not recognised. Error will most likely occur when posting a training notice.')
                 mycursor.execute("UPDATE `trainingsessions` SET `TrainingType` = '" + newinfo + "' WHERE `trainingsessions`.`ID` = " + trainingid + ";")
+                AltonDB.commit()
+                await message.channel.send('Successfully updated TrainingType to ' + newinfo)
             elif 'time' in messege.lower():
                 await message.channel('Sorry, editing time is not supported yet, please dm lucky962 to edit time')
                 # if ('pm' in formattedtime.lower()) or ('am' in formattedtime.lower()):
@@ -126,7 +132,6 @@ async def on_message(message):
                 #     time = datetime.datetime.strptime(str(time), '%H:%M')
             elif 'date' in messege.lower():
                 await message.channel('Sorry, editing date is not supported yet, please dm lucky962 to edit date')
-            
         elif messege.startswith('nexttraining'):
             IDtrainings = []
             POtrainings = []
