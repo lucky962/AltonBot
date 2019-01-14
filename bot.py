@@ -89,49 +89,56 @@ async def on_message(message):
                 AltonDB.commit()
                 await message.channel.send('Successfully deleted ' + str(mycursor.rowcount) + ' training session(s)')
         elif messege.startswith('edittraining'):
-            await message.channel.send('Edittraining command still in early development, there may be a few bugs!')
-            trainingid = (messege.split(' '))[1]
-            part = message.content.split(':')
-            newinfo = part[1].strip(' ')
-            if 'co-host' in messege.lower() or 'cohost' in message.lower():
-                mycursor.execute("UPDATE `trainingsessions` SET `Cohost` = '" + newinfo + "' WHERE `trainingsessions`.`ID` = " + trainingid + ";")
-                AltonDB.commit()
-                await message.channel.send('Successfully updated Co-host to ' + newinfo)
-            elif 'host' in messege.lower():
-                mycursor.execute("UPDATE `trainingsessions` SET `Host` = '" + newinfo + "' WHERE `trainingsessions`.`ID` = " + trainingid + ";")
-                AltonDB.commit()
-                await message.channel.send('Successfully updated Host to ' + newinfo)
-            elif 'type' in messege.lower():
-                if ('Dispatch' in trainingtype) or ('DS' in trainingtype) or ('Platform' in trainingtype) or ('PO' in trainingtype):
-                    newinfo = 'Platform Operator Training'
-                elif ('Experience' in trainingtype) or ('ED' in trainingtype) or ('Intermediate' in trainingtype) or ('ID' in trainingtype):
-                    newinfo = 'Intermediate Driver Training'
-                else:
-                    await message.channel.send('Training type not recognised. Error will most likely occur when posting a training notice.')
-                mycursor.execute("UPDATE `trainingsessions` SET `TrainingType` = '" + newinfo + "' WHERE `trainingsessions`.`ID` = " + trainingid + ";")
-                AltonDB.commit()
-                await message.channel.send('Successfully updated TrainingType to ' + newinfo)
-            elif 'time' in messege.lower():
-                await message.channel('Sorry, editing time is not supported yet, please dm lucky962 to edit time')
-                # if ('pm' in formattedtime.lower()) or ('am' in formattedtime.lower()):
-                #     newinfo = newinfo.replace(' ', '')
-                #     formattedtime = (date + ' ') + formattedtime
-                #     TrainingTime = datetime.datetime.strptime(formattedtime, '%d/%m/%Y %I:%M%p')
-                #     time = datetime.datetime.strptime(str(time), '%I:%M%p')
-                # elif (not (':' in formattedtime)):
-                #     if len(formattedtime) == 4:
-                #         formattedtime = time = (formattedtime[:2] + ':') + formattedtime[2:]
-                #     elif len(formattedtime) == 3:
-                #         formattedtime = time = (('0' + formattedtime[:1]) + ':') + formattedtime[1:]
-                #     formattedtime = (date + ' ') + formattedtime
-                #     TrainingTime = datetime.datetime.strptime(formattedtime, '%d/%m/%Y %H:%M')
-                #     time = datetime.datetime.strptime(str(time), '%H:%M')
-                # elif ':' in formattedtime:
-                #     formattedtime = (date + ' ') + formattedtime
-                #     TrainingTime = datetime.datetime.strptime(formattedtime, '%d/%m/%Y %H:%M')
-                #     time = datetime.datetime.strptime(str(time), '%H:%M')
-            elif 'date' in messege.lower():
-                await message.channel('Sorry, editing date is not supported yet, please dm lucky962 to edit date')
+            roles = []
+            for i in message.author.roles:
+                roles.append(i.name)
+            print(roles)
+            if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
+                await message.channel.send('Edittraining command still in early development, there may be a few bugs!')
+                trainingid = (messege.split(' '))[1]
+                part = message.content.split(':')
+                newinfo = part[1].strip(' ')
+                if 'co-host' in messege.lower() or 'cohost' in message.lower():
+                    mycursor.execute("UPDATE `trainingsessions` SET `Cohost` = '" + newinfo + "' WHERE `trainingsessions`.`ID` = " + trainingid + ";")
+                    AltonDB.commit()
+                    await message.channel.send('Successfully updated Co-host to ' + newinfo)
+                elif 'host' in messege.lower():
+                    mycursor.execute("UPDATE `trainingsessions` SET `Host` = '" + newinfo + "' WHERE `trainingsessions`.`ID` = " + trainingid + ";")
+                    AltonDB.commit()
+                    await message.channel.send('Successfully updated Host to ' + newinfo)
+                elif 'type' in messege.lower():
+                    if ('Dispatch' in trainingtype) or ('DS' in trainingtype) or ('Platform' in trainingtype) or ('PO' in trainingtype):
+                        newinfo = 'Platform Operator Training'
+                    elif ('Experience' in trainingtype) or ('ED' in trainingtype) or ('Intermediate' in trainingtype) or ('ID' in trainingtype):
+                        newinfo = 'Intermediate Driver Training'
+                    else:
+                        await message.channel.send('Training type not recognised. Error will most likely occur when posting a training notice.')
+                    mycursor.execute("UPDATE `trainingsessions` SET `TrainingType` = '" + newinfo + "' WHERE `trainingsessions`.`ID` = " + trainingid + ";")
+                    AltonDB.commit()
+                    await message.channel.send('Successfully updated TrainingType to ' + newinfo)
+                elif 'time' in messege.lower():
+                    await message.channel.send('Sorry, editing time is not supported yet, please dm lucky962 to edit time')
+                    # if ('pm' in formattedtime.lower()) or ('am' in formattedtime.lower()):
+                    #     newinfo = newinfo.replace(' ', '')
+                    #     formattedtime = (date + ' ') + formattedtime
+                    #     TrainingTime = datetime.datetime.strptime(formattedtime, '%d/%m/%Y %I:%M%p')
+                    #     time = datetime.datetime.strptime(str(time), '%I:%M%p')
+                    # elif (not (':' in formattedtime)):
+                    #     if len(formattedtime) == 4:
+                    #         formattedtime = time = (formattedtime[:2] + ':') + formattedtime[2:]
+                    #     elif len(formattedtime) == 3:
+                    #         formattedtime = time = (('0' + formattedtime[:1]) + ':') + formattedtime[1:]
+                    #     formattedtime = (date + ' ') + formattedtime
+                    #     TrainingTime = datetime.datetime.strptime(formattedtime, '%d/%m/%Y %H:%M')
+                    #     time = datetime.datetime.strptime(str(time), '%H:%M')
+                    # elif ':' in formattedtime:
+                    #     formattedtime = (date + ' ') + formattedtime
+                    #     TrainingTime = datetime.datetime.strptime(formattedtime, '%d/%m/%Y %H:%M')
+                    #     time = datetime.datetime.strptime(str(time), '%H:%M')
+                elif 'date' in messege.lower():
+                    await message.channel('Sorry, editing date is not supported yet, please dm lucky962 to edit date')
+            else: 
+                await message.channel.send('Sorry, you have to be an LD+ to edit trainings.')
         elif messege.startswith('nexttraining'):
             IDtrainings = []
             POtrainings = []
@@ -267,7 +274,7 @@ async def on_message(message):
             HelpMsg.set_author(name='Alton Bot', icon_url=client.user.avatar_url)
             HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'nexttraining', value='Shows upcoming training sessions.')
             HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'trainingreminder [id]', value='**LD+ Only** - Sends a training reminder about the specified training.')
-            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'edittraining [id] [fieldtochange]: [valuetochangeto]', value='**LD+ Only** - edits training session specified **COMING SOON**')
+            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'edittraining [id] [fieldtochange]: [valuetochangeto]', value='**LD+ Only** - edits training session specified **Currently in BETA**')
             HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'deletetraining [id]', value='**LD+ Only** - deletes training session specified.')
             HelpMsg.set_footer(icon_url=client.user.avatar_url, text='© Alton County Railways')
             await message.channel.send(embed=HelpMsg)
