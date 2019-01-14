@@ -136,7 +136,9 @@ async def on_message(message):
                     #     TrainingTime = datetime.datetime.strptime(formattedtime, '%d/%m/%Y %H:%M')
                     #     time = datetime.datetime.strptime(str(time), '%H:%M')
                 elif 'date' in messege.lower():
-                    await message.channel('Sorry, editing date is not supported yet, please dm lucky962 to edit date')
+                    await message.channel.send('Sorry, editing date is not supported yet, please dm lucky962 to edit date')
+                else:
+                    await message.channel.send('Sorry, no info found. The syntax is -edittraining [id] [thing to change]: [value to change to]')
             else: 
                 await message.channel.send('Sorry, you have to be an LD+ to edit trainings.')
         elif messege.startswith('nexttraining'):
