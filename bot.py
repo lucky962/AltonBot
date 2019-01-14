@@ -98,7 +98,7 @@ async def on_message(message):
                 trainingid = (messege.split(' '))[1]
                 part = message.content.split(':')
                 newinfo = part[1].strip(' ')
-                if 'co-host' in messege.lower() or 'cohost' in message.lower():
+                if 'co-host' in messege.lower() or 'cohost' in messege.lower():
                     mycursor.execute("UPDATE `trainingsessions` SET `Cohost` = '" + newinfo + "' WHERE `trainingsessions`.`ID` = " + trainingid + ";")
                     AltonDB.commit()
                     await message.channel.send('Successfully updated Co-host to ' + newinfo)
