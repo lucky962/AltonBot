@@ -255,13 +255,16 @@ async def on_message(message):
                 noofwarns = mycursor.rowcount
                 AltonDB.commit()
                 try:
-                    nickname = message.guild.get_member(int(part[1])).nick
-                except AttributeError:
-                    nickname = await client.get_user_info(int(part[1]))
-                    nickname = nickname.name
-                if nickname == None:
-                    nickname = await client.get_user_info(int(part[1]))
-                    nickname = nickname.name
+                    try:
+                        nickname = message.guild.get_member(int(part[1])).nick
+                    except AttributeError:
+                        nickname = await client.get_user_info(int(part[1]))
+                        nickname = nickname.name
+                    if nickname == None:
+                        nickname = await client.get_user_info(int(part[1]))
+                        nickname = nickname.name
+                except discord.errors.NotFound:
+                    nickname = str(part[1])
                 await message.channel.send('Successfully cleared ' + str(noofwarns) + ' warnings for ' + nickname)
             else:
                 await message.channel.send('You have to be an LD+ to clear warnings.')
