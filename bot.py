@@ -219,9 +219,9 @@ async def on_message(message):
                 baninfo = messege.split(' ', maxsplit=2)
                 baninfo[1] = tagtoid(baninfo[1], message)
                 try:
-                    await message.channel.send(((('<@' + baninfo[1]) + '> has been banned for: ') + kickinfo[2]) + '.')
+                    await message.channel.send(((('<@' + baninfo[1]) + '> has been banned for: ') + baninfo[2]) + '.')
                     try:
-                        await message.guild.get_member(int(kickinfo[1])).send('You have been banned from Alton County Railways for: ' + kickinfo[2])
+                        await message.guild.get_member(int(baninfo[1])).send('You have been banned from Alton County Railways for: ' + baninfo[2])
                     except discord.errors.Forbidden:
                         pass
                     await message.guild.ban(message.guild.get_member(int(baninfo[1])), reason=baninfo[2])
