@@ -238,7 +238,7 @@ async def on_message(message):
                     except discord.errors.Forbidden:
                         pass
                     await message.guild.ban(message.guild.get_member(int(baninfo[1])), reason=baninfo[2])
-                    mycursor.execute("INSERT INTO warnlist (Banned, Banner, Reason) VALUES ('" + baninfo[1] + "', '" + str(message.author.id) + "', '" + warning[2] + "');")
+                    mycursor.execute("INSERT INTO warnlist (Banned, Banner, Reason) VALUES ('" + baninfo[1] + "', '" + str(message.author.id) + "', '" + baninfo[2] + "');")
                     AltonDB.commit()
                 except discord.errors.Forbidden:
                     await message.channel.send('I do not have permissions to ban this user.')
