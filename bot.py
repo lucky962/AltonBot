@@ -281,7 +281,10 @@ async def on_message(message):
                     except discord.errors.NotFound:
                         warner = str(row[2])
                     msg.append('*' + warned + '* was warned by *' + warner + '* for reason: ' + row[3])
-                await message.channel.send('\n'.join(msg))
+                try:
+                    await message.channel.send('\n'.join(msg))
+                except discord.errors.HTTPException:
+                    await message.channel.send('This user has no warnings.')
         elif messege.startswith('clearwarn'):
             part = message.content.split(' ')
             roles = []
