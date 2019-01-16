@@ -184,7 +184,20 @@ async def on_message(message):
                                 pass
                             await message.guild.kick(message.guild.get_member(int(warning[1])), reason=str(noofwarns) + ' warnings')
                         except discord.errors.Forbidden:
-                            await message.channel.send("Sorry, I don't have the permissions to kick that user yet.")
+                            await message.channel.send("Sorry, I don't have the permissions to kick that user.")
+                    elif (noofwarns > 8):
+                        try:
+                            await message.channel.send(((('<@' + warning[1]) + '> will now be banned for having ') + str(noofwarns)) + ' warnings.')
+                            try:
+                                await message.guild.get_member(int(warning[1])).send(('You have been banned from Alton County Railways for having ' + str(noofwarns)) + ' warnings.')
+                            except discord.errors.Forbidden:
+                                pass
+                            await message.guild.ban(message.guild.get_member(int(warning[1])), reason=str(noofwarns) + ' warnings')
+                            mycursor.execute("INSERT INTO warnlist (Banned, Banner, Reason) VALUES ('" + baninfo[1] + "', '" + str(message.author.id) + "', '" + warning[2] + "');")
+                            AltonDB.commit()
+                        except discord.errors.Forbidden:
+                            await message.channel.send("Sorry, I don't have the permissions to ban that user.")
+
                 except IndexError:
                     await message.channel.send('A reason is needed to issue a warning.')
             else:
@@ -225,6 +238,8 @@ async def on_message(message):
                     except discord.errors.Forbidden:
                         pass
                     await message.guild.ban(message.guild.get_member(int(baninfo[1])), reason=baninfo[2])
+                    mycursor.execute("INSERT INTO warnlist (Banned, Banner, Reason) VALUES ('" + baninfo[1] + "', '" + str(message.author.id) + "', '" + warning[2] + "');")
+                    AltonDB.commit()
                 except discord.errors.Forbidden:
                     await message.channel.send('I do not have permissions to ban this user.')
                 except IndexError:
