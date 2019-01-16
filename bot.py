@@ -210,6 +210,27 @@ async def on_message(message):
                     await message.channel.send('A reason is needed to kick.')
             else:
                 await message.channel.send('Sorry, you have to be an LD+ to kick.')
+        elif messege.startswith('ban '):
+            roles = []
+            for i in message.author.roles:
+                roles.append(i.name)
+            print(roles)
+            if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
+                baninfo = messege.split(' ', maxsplit=2)
+                baninfo[1] = tagtoid(baninfo[1], message)
+                try:
+                    await message.channel.send(((('<@' + baninfo[1]) + '> has been banned for: ') + kickinfo[2]) + '.')
+                    try:
+                        await message.guild.get_member(int(kickinfo[1])).send('You have been banned from Alton County Railways for: ' + kickinfo[2])
+                    except discord.errors.Forbidden:
+                        pass
+                    await message.guild.ban(message.guild.get_member(int(baninfo[1])), reason=baninfo[2])
+                except discord.errors.Forbidden:
+                    await message.channel.send('I do not have permissions to ban this user.')
+                except IndexError:
+                    await message.channel.send('A reason is needed to kick.')
+            else:
+                await message.channel.send('Sorry, you have to be an LD+ to ban.')
         elif messege.startswith('warnings'):
             roles = []
             msg = []
@@ -275,7 +296,7 @@ async def on_message(message):
             HelpMsg.set_author(name='Alton Bot', icon_url=client.user.avatar_url)
             HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'warn [user]', value='**LD+ Only** - warns a user')
             HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'kick [user]', value='**LD+ Only** - kicks a user')
-            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'ban [user] [time]', value='**MOD+ Only** - bans a user indefinetely or for a certain time. **COMING SOON**')
+            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'ban [user]', value='**MOD+ Only** - bans a user indefinetely or until unbanned. **COMING SOON**')
             HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'warnings [user(optional)]', value='Displays all warnings currently stored in memory or just for the user.')
             HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'clearwarnings [user]', value='**LD+ Only** - clears the warnings of a certain player.')
             HelpMsg.set_footer(icon_url=client.user.avatar_url, text='© Alton County Railways')
