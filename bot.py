@@ -237,6 +237,8 @@ async def on_message(message):
                         await message.guild.get_member(int(baninfo[1])).send('You have been banned from Alton County Railways for: ' + baninfo[2])
                     except discord.errors.Forbidden:
                         pass
+                    except AttributeError:
+                        pass
                     await message.guild.ban(message.guild.get_member(int(baninfo[1])), reason=baninfo[2])
                     mycursor.execute("INSERT INTO banlist (Banned, Banner, Reason) VALUES ('" + baninfo[1] + "', '" + str(message.author.id) + "', '" + baninfo[2] + "');")
                     AltonDB.commit()
