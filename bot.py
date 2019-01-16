@@ -231,7 +231,7 @@ async def on_message(message):
                             warned = await client.get_user_info(int(row[1]))
                             warned = warned.name
                     except discord.errors.NotFound:
-                        warned = row[1]
+                        warned = str(row[1])
                     try:
                         try:
                             warner = message.guild.get_member(int(row[2])).nick
@@ -241,7 +241,7 @@ async def on_message(message):
                             warner = await client.get_user_info(int(row[2]))
                             warner = warner.name
                     except discord.errors.NotFound:
-                        warned = row[1]
+                        warned = str(row[1])
                     msg.append('*' + warned + '* was warned by *' + warner + '* for reason: ' + row[3])
                 await message.channel.send('\n'.join(msg))
         elif messege.startswith('clearwarn'):
