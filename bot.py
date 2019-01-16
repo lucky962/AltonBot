@@ -228,7 +228,7 @@ async def on_message(message):
             for i in message.author.roles:
                 roles.append(i.name)
             print(roles)
-            if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
+            if ('Executive Team' in roles) or ('Management Team' in roles):
                 baninfo = messege.split(' ', maxsplit=2)
                 baninfo[1] = tagtoid(baninfo[1], message)
                 try:
@@ -247,7 +247,7 @@ async def on_message(message):
                 except IndexError:
                     await message.channel.send('A reason is needed to kick.')
             else:
-                await message.channel.send('Sorry, you have to be an LD+ to ban.')
+                await message.channel.send('Sorry, you have to be an MOD+ to ban.')
         elif messege.startswith('warnings'):
             roles = []
             msg = []
@@ -316,7 +316,7 @@ async def on_message(message):
             HelpMsg.set_author(name='Alton Bot', icon_url=client.user.avatar_url)
             HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'warn [user]', value='**LD+ Only** - warns a user')
             HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'kick [user]', value='**LD+ Only** - kicks a user')
-            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'ban [user]', value='**MOD+ Only** - bans a user indefinetely or until unbanned. **COMING SOON**')
+            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'ban [user]', value='**MOD+ Only** - bans a user indefinetely or until unbanned.')
             HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'warnings [user(optional)]', value='Displays all warnings currently stored in memory or just for the user.')
             HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'clearwarnings [user]', value='**LD+ Only** - clears the warnings of a certain player.')
             HelpMsg.set_footer(icon_url=client.user.avatar_url, text='© Alton County Railways')
