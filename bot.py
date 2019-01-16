@@ -107,9 +107,9 @@ async def on_message(message):
                     AltonDB.commit()
                     await message.channel.send('Successfully updated Host to ' + newinfo)
                 elif 'type' in messege.lower():
-                    if ('Dispatch' in trainingtype) or ('DS' in trainingtype) or ('Platform' in trainingtype) or ('PO' in trainingtype):
+                    if ('Dispatch' in newinfo) or ('DS' in newinfo) or ('Platform' in newinfo) or ('PO' in newinfo):
                         newinfo = 'Platform Operator Training'
-                    elif ('Experience' in trainingtype) or ('ED' in trainingtype) or ('Intermediate' in trainingtype) or ('ID' in trainingtype):
+                    elif ('Experience' in newinfo) or ('ED' in newinfo) or ('Intermediate' in newinfo) or ('ID' in newinfo):
                         newinfo = 'Intermediate Driver Training'
                     else:
                         await message.channel.send('Training type not recognised. Error will most likely occur when posting a training notice.')
@@ -148,7 +148,7 @@ async def on_message(message):
             AltonDB.commit()
             mycursor.execute("SELECT * FROM `trainingsessions` WHERE `TrainingType` = 'Intermediate Driver Training' ORDER BY `trainingsessions`.`TrainingTime` ASC")
             IDtrainings = mycursor.fetchall()
-            mycursor.execute("SELECT * FROM `trainingsessions` WHERE `TrainingType` = 'Platform Operator Training'")
+            mycursor.execute("SELECT * FROM `trainingsessions` WHERE `TrainingType` = 'Platform Operator Training' ORDER BY `trainingsessions`.`TrainingTime` ASC")
             POtrainings = mycursor.fetchall()
             nexttrainingmsg = ['**UPCOMING ID TRAININGS**']
             for row in IDtrainings:
