@@ -270,6 +270,8 @@ async def on_message(message):
             for i in message.author.roles:
                 roles.append(i.name)
             if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
+                AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
+                mycursor = AltonDB.cursor(buffered=True)
                 mycursor.execute("SELECT * FROM `warnlist`" + search + " ORDER BY `warnlist`.`Warned` ASC")
                 warnings  = mycursor.fetchall()
                 for row in warnings:
