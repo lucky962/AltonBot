@@ -10,9 +10,10 @@ from Dependencies.ServerPrefixes import *
 print(CMDPrefix)
 with open('BotToken.txt') as f:
     TOKEN = f.read()
-AltonDB = mysql.connector.connect(host='localhost', user='root', passwd='Password', database='AltonBot')
-noticechannel = 520701561564037143
-requestchannel = 528528451192356874
+hostip = 'localhost'
+AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
+noticechannel = 529987720848867328
+requestchannel = 514331989764210698
 mycursor = AltonDB.cursor(buffered=True)
 os.chdir('Dependencies')
 client = discord.Client()
@@ -45,6 +46,8 @@ async def on_message(message):
             if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
                 print('TRAININGREMINDER')
                 trainingid = (messege[17:])
+                AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
+                mycursor = AltonDB.cursor(buffered=True)
                 mycursor.execute('SELECT * FROM trainingsessions')
                 for row in mycursor.fetchall():
                     if str(row[0]) == trainingid:
@@ -85,6 +88,8 @@ async def on_message(message):
             print(roles)
             if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
                 trainingid = messege[15:]
+                AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
+                mycursor = AltonDB.cursor(buffered=True)
                 mycursor.execute('DELETE FROM `trainingsessions` WHERE `ID` = ' + trainingid)
                 AltonDB.commit()
                 await message.channel.send('Successfully deleted ' + str(mycursor.rowcount) + ' training session(s)')
@@ -94,6 +99,8 @@ async def on_message(message):
                 roles.append(i.name)
             print(roles)
             if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
+                AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
+                mycursor = AltonDB.cursor(buffered=True)
                 await message.channel.send('Edittraining command still in early development, there may be a few bugs!')
                 trainingid = (messege.split(' '))[1]
                 part = message.content.split(':')
@@ -142,6 +149,8 @@ async def on_message(message):
             else: 
                 await message.channel.send('Sorry, you have to be an LD+ to edit trainings.')
         elif messege.startswith('nexttraining'):
+            AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
+            mycursor = AltonDB.cursor(buffered=True)
             IDtrainings = []
             POtrainings = []
             mycursor.execute('DELETE FROM `trainingsessions` WHERE `TrainingTime` < "' + str(datetime.datetime.now() - datetime.timedelta(hours=11)) + '"')
@@ -165,6 +174,8 @@ async def on_message(message):
             if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
                 warning = messege.split(' ', maxsplit=2)
                 warning[1] = tagtoid(warning[1], message)
+                AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
+                mycursor = AltonDB.cursor(buffered=True)
                 try:
                     mycursor.execute("INSERT INTO warnlist (Warned, Warner, Reason) VALUES ('" + warning[1] + "', '" + str(message.author.id) + "', '" + warning[2] + "');")
                     AltonDB.commit()
@@ -231,6 +242,8 @@ async def on_message(message):
             if ('Executive Team' in roles) or ('Management Team' in roles):
                 baninfo = messege.split(' ', maxsplit=2)
                 baninfo[1] = tagtoid(baninfo[1], message)
+                AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
+                mycursor = AltonDB.cursor(buffered=True)
                 try:
                     await message.channel.send(((('<@' + baninfo[1]) + '> has been banned for: ') + baninfo[2]) + '.')
                     try:
@@ -292,6 +305,8 @@ async def on_message(message):
                 roles.append(i.name)
             if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
                 part[1] = tagtoid(part[1], message)
+                AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
+                mycursor = AltonDB.cursor(buffered=True)
                 mycursor.execute("DELETE FROM `warnlist` WHERE `warned` = '" + part[1] + "'")
                 noofwarns = mycursor.rowcount
                 AltonDB.commit()
@@ -470,6 +485,8 @@ async def on_reaction_add(reaction, user):
             else:
                 cohosttemp = (", '" + cohost) + "');"
                 cohosttempz = ', Cohost'
+            AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
+            mycursor = AltonDB.cursor(buffered=True)
             mycursor.execute((((((((((('INSERT INTO trainingsessions (ID, TrainingType, TrainingTime, Host' + cohosttempz) + ") VALUES ('") + str(reaction.message.id)) + "', '") + trainingtype) + "', '") + str(TrainingTime)) + "', '") + host) + "'") + cohosttemp)
             AltonDB.commit()
             await client.get_channel(noticechannel).send((((((((((((((((((((('Attention **' + notifiedrank) + "**, just letting you know that there'll be a ") + trainedrank) + ' Training in **') + str(diff.days)) + ' days, ') + str(diff.hours)) + ' hours, ') + str(diff.minutes)) + ' minutes  / ') + time) + '!** (') + date) + ') \n\nHost: ') + host) + ((' \nCo-host: ' + cohost) + '\n' if cohost != None else '\n')) + '\nThe link will be posted on the __**Group Wall or Group Shout (One Of the two)**__ **10** minutes before its scheduled time. [**') + posttime) + '**].\n\nOnce you join, please spawn as a __**passenger**__ at __**Standen Station**__ and line up __**against the ticket machines!**__\n\nThanks for reading,\n**') + reaction.message.author.nick) + '**')
