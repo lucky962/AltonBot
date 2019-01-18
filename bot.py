@@ -13,19 +13,78 @@ with open('BotToken.txt') as f:
     TOKEN = f.read()
 hostip = 'localhost'
 AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
-noticechannel = 529987720848867328
-requestchannel = 514331989764210698
+noticechannel = 520701561564037143
+requestchannel = 528528451192356874
 mycursor = AltonDB.cursor(buffered=True)
 os.chdir('Dependencies')
-client = discord.Client()
+
+class MyClient(discord.Client):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # create the background task and run it in the background
+        self.bg_task = self.loop.create_task(self.my_background_task())
+
+    async def on_ready(self):
+        await client.change_presence(activity=discord.Game(name=(CMDPrefix.get(514155943525875716) if 514155943525875716 in CMDPrefix else '!') + 'help'))
+        print('Logged in as')
+        print(self.user.name)
+        print(self.user.id)
+        print('------')
+
+    async def my_background_task(self):
+        print('automaticreminder task started')
+        await self.wait_until_ready()
+        print('client is')
+        noticechanne = self.get_channel(noticechannel)
+        print(noticechanne)
+        while not self.is_closed():
+            AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
+            mycursor = AltonDB.cursor(buffered=True)
+            mycursor.execute("SELECT * FROM `trainingsessions` WHERE `TrainingTime` < '" + str(datetime.datetime.now() - datetime.timedelta(hours=12)) + "' AND `Reminded` = 0")
+            trainingreminders = mycursor.fetchall()
+            for row in trainingreminders:
+                print(row)
+                trainingtype = row[1]
+                print(trainingtype)
+                time = datetime.datetime.strptime(str(row[2])[11:16], '%H:%M')
+                posttime = (time - datetime.timedelta(minutes=10)).strftime('%I:%M %p')
+                time = str(time.strftime('%I:%M %p'))
+                date = str(datetime.datetime.strptime(str(row[2])[:10], '%Y-%m-%d').strftime('%d %B %Y'))
+                formattedtime = str(row[2])
+                host = row[3]
+                cohost = row[4]
+                TrainingTime = datetime.datetime.strptime(formattedtime, '%Y-%m-%d %H:%M:%S')
+                currenttime = str(datetime.datetime.now() - datetime.timedelta(hours=11) - datetime.timedelta(minutes=1))
+                currenttime = datetime.datetime.strptime(currenttime, '%Y-%m-%d %H:%M:%S.%f')
+                diff = relativedelta(TrainingTime, currenttime)
+                if ('Dispatch' in trainingtype) or ('DS' in trainingtype) or ('Platform' in trainingtype) or ('PO' in trainingtype):
+                    notifiedrank = 'INTERMEDIATE DRIVERS'
+                    trainedrank = 'Platform Operator **[PO]**'
+                elif ('Experience' in trainingtype) or ('ED' in trainingtype) or ('Intermediate' in trainingtype) or ('ID' in trainingtype):
+                    notifiedrank = 'NOVICE DRIVERS'
+                    trainedrank = 'Intermediate Driver **[ID]**'
+                elif 'Dev' in trainingtype:
+                    trainingtype = 'Developer Training'
+                    notifiedrank = 'Trainee Developer'
+                    trainedrank = 'Developer'
+                print('ahsdhfadsf')
+                time = time + ' GMT'
+                await self.get_channel(noticechannel).send((((((((((((((((((((('Attention **' + notifiedrank) + "**, just a reminder that there'll be a ") + trainedrank) + ' Training in **') + str(diff.days)) + ' days, ') + str(diff.hours)) + ' hours, ') + str(diff.minutes)) + ' minutes  / ') + time) + '!** (') + date) + ') \n\nHost: ') + host) + ((' \nCo-host: ' + cohost) + '\n' if cohost != None else '\n')) + '\nThe link will be posted on the __**Group Wall or Group Shout (One Of the two)**__ **10** minutes before its scheduled time. [**') + posttime) + '**].\n\nOnce you join, please spawn as a __**passenger**__ at __**Standen Station**__ and line up __**against the ticket machines!**__\n\nThanks for reading,\n**') + row[3]) + '**')
+                mycursor.execute("UPDATE `trainingsessions` SET `Reminded` = '1' WHERE `trainingsessions`.`ID` = " + str(row[0]) + ";")
+                AltonDB.commit()
+                print('done')
+            await asyncio.sleep(10)
+
+client = MyClient()
 
 def tagtoid(tag, message): # Changes discord tag to id
     try:
         isd = int(tag.lstrip('<@!').lstrip('<@').rstrip('>'))
         return (str(isd))
     except ValueError:
-        return(message.guild.get_member_named(tag).id)
-
+        return(message.guild.get_member_named(tag).id)    
+  
 @client.event
 async def on_message(message):
     print(message.author)
@@ -63,7 +122,7 @@ async def on_message(message):
                         host = row[3]
                         cohost = row[4]
                         TrainingTime = datetime.datetime.strptime(formattedtime, '%Y-%m-%d %H:%M:%S')
-                        currenttime = str(datetime.datetime.now() - datetime.timedelta(hours=11))
+                        currenttime = str(datetime.datetime.now() - datetime.timedelta(hours=11) - datetime.timedelta(minutes=1))
                         currenttime = datetime.datetime.strptime(currenttime, '%Y-%m-%d %H:%M:%S.%f')
                         diff = relativedelta(TrainingTime, currenttime)
                         if ('Dispatch' in trainingtype) or ('DS' in trainingtype) or ('Platform' in trainingtype) or ('PO' in trainingtype):
@@ -500,11 +559,4 @@ async def on_reaction_add(reaction, user):
             # await client.get_channel(noticechannel).send((((((((((((((((((((('Attention **' + notifiedrank) + "**, just letting you know that there'll be a ") + trainedrank) + ' Training in **') + str(diff.days)) + ' days, ') + str(diff.hours)) + ' hours, ') + str(diff.minutes)) + ' minutes  / ') + time) + '!** (') + date) + ') \n\nHost: ') + host) + ((' \nCo-host: ' + cohost) + '\n' if cohost != None else '\n')) + '\nThe link will be posted on the __**Group Wall or Group Shout (One Of the two)**__ **10** minutes before its scheduled time. [**') + posttime) + '**].\n\nOnce you join, please spawn as a __**passenger**__ at __**Standen Station**__ and line up __**against the ticket machines!**__\n\nThanks for reading,\n**') + reaction.message.author.nick) + '**')
             await reaction.message.channel.send(('Thank you for hosting a Training session, please remember your id, ' + str(reaction.message.id)) + ', in order to run more commands for your training session in the future using AltonBot')
 
-@client.event
-async def on_ready():
-    await client.change_presence(activity=discord.Game(name=(CMDPrefix.get(514155943525875716) if 514155943525875716 in CMDPrefix else '!') + 'help'))
-    print('Logged in as')
-    print(client.user.name)
-    print(client.user.id)
-    print('------')
 client.run(TOKEN)
