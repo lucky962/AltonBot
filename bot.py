@@ -7,6 +7,7 @@ import time
 import asyncio
 from dateutil.relativedelta import relativedelta
 from Dependencies.ServerPrefixes import *
+from discord.ext import *
 print(CMDPrefix)
 with open('BotToken.txt') as f:
     TOKEN = f.read()
@@ -384,9 +385,14 @@ async def on_message(message):
                         f.write(((("    '" + key) + "':'") + val) + "',\n")
                     f.write('}\n')
             await client.change_presence(activity=discord.Game(name=(CMDPrefix.get(514155943525875716) if 514155943525875716 in CMDPrefix else '!') + 'help'))
+        elif messege.startswith('await'):
+            if message.author.id == 244596682531143680:
+                await eval(messege[6:])
+            else:
+                await message.channel.send('Sorry lucky962 is the only person who can run this command at this moment.')
         elif messege.startswith('rawcommand'):
             if message.author.id == 244596682531143680:
-                exec(messege[11:])
+                exec(message[11:])
             else:
                 await message.channel.send('Sorry lucky962 is the only person who can run this command at this moment.')
         
@@ -395,7 +401,7 @@ async def on_message(message):
 async def on_reaction_add(reaction, user):
     if reaction.emoji == '✅':
         if reaction.message.channel == client.get_channel(requestchannel):
-            trainingtype = time = host = cohost = notifiedrank = trainedrank = ''
+            trainingtype = time = host = cohost = ''
             try:
                 trainingtype = re.search('Type:(.*)\n', reaction.message.content).group(1).strip('*').strip(' ')
             except:
@@ -446,9 +452,9 @@ async def on_reaction_add(reaction, user):
                 await reaction.message.channel.send('Time Format not recognised')
             currenttime = str(datetime.datetime.now() - datetime.timedelta(hours=11))
             currenttime = datetime.datetime.strptime(currenttime, '%Y-%m-%d %H:%M:%S.%f')
-            posttime = (time - datetime.timedelta(minutes=10)).strftime('%I:%M %p')
+            # posttime = (time - datetime.timedelta(minutes=10)).strftime('%I:%M %p')
             time = str(time.strftime('%I:%M %p'))
-            diff = relativedelta(TrainingTime, currenttime)
+            # diff = relativedelta(TrainingTime, currenttime)
             try:
                 host = re.search('Host:(.*)\n', reaction.message.content).group(1).strip('*').strip(' ')
             except:
@@ -471,16 +477,16 @@ async def on_reaction_add(reaction, user):
             print('tasdfad')
             if ('Dispatch' in trainingtype) or ('DS' in trainingtype) or ('Platform' in trainingtype) or ('PO' in trainingtype):
                 trainingtype = 'Platform Operator Training'
-                notifiedrank = 'INTERMEDIATE DRIVERS'
-                trainedrank = 'Platform Operator **[PO]**'
+                # notifiedrank = 'INTERMEDIATE DRIVERS'
+                # trainedrank = 'Platform Operator **[PO]**'
             elif ('Experience' in trainingtype) or ('ED' in trainingtype) or ('Intermediate' in trainingtype) or ('ID' in trainingtype):
                 trainingtype = 'Intermediate Driver Training'
-                notifiedrank = 'NOVICE DRIVERS'
-                trainedrank = 'Intermediate Driver **[ID]**'
+                # notifiedrank = 'NOVICE DRIVERS'
+                # trainedrank = 'Intermediate Driver **[ID]**'
             elif 'Dev' in trainingtype:
                 trainingtype = 'Developer Training'
-                notifiedrank = 'Trainee Developer'
-                trainedrank = 'Developer'
+                # notifiedrank = 'Trainee Developer'
+                # trainedrank = 'Developer'
             if cohost == None:
                 cohosttemp = ');'
                 cohosttempz = ''
@@ -491,7 +497,7 @@ async def on_reaction_add(reaction, user):
             mycursor = AltonDB.cursor(buffered=True)
             mycursor.execute((((((((((('INSERT INTO trainingsessions (ID, TrainingType, TrainingTime, Host' + cohosttempz) + ") VALUES ('") + str(reaction.message.id)) + "', '") + trainingtype) + "', '") + str(TrainingTime)) + "', '") + host) + "'") + cohosttemp)
             AltonDB.commit()
-            await client.get_channel(noticechannel).send((((((((((((((((((((('Attention **' + notifiedrank) + "**, just letting you know that there'll be a ") + trainedrank) + ' Training in **') + str(diff.days)) + ' days, ') + str(diff.hours)) + ' hours, ') + str(diff.minutes)) + ' minutes  / ') + time) + '!** (') + date) + ') \n\nHost: ') + host) + ((' \nCo-host: ' + cohost) + '\n' if cohost != None else '\n')) + '\nThe link will be posted on the __**Group Wall or Group Shout (One Of the two)**__ **10** minutes before its scheduled time. [**') + posttime) + '**].\n\nOnce you join, please spawn as a __**passenger**__ at __**Standen Station**__ and line up __**against the ticket machines!**__\n\nThanks for reading,\n**') + reaction.message.author.nick) + '**')
+            # await client.get_channel(noticechannel).send((((((((((((((((((((('Attention **' + notifiedrank) + "**, just letting you know that there'll be a ") + trainedrank) + ' Training in **') + str(diff.days)) + ' days, ') + str(diff.hours)) + ' hours, ') + str(diff.minutes)) + ' minutes  / ') + time) + '!** (') + date) + ') \n\nHost: ') + host) + ((' \nCo-host: ' + cohost) + '\n' if cohost != None else '\n')) + '\nThe link will be posted on the __**Group Wall or Group Shout (One Of the two)**__ **10** minutes before its scheduled time. [**') + posttime) + '**].\n\nOnce you join, please spawn as a __**passenger**__ at __**Standen Station**__ and line up __**against the ticket machines!**__\n\nThanks for reading,\n**') + reaction.message.author.nick) + '**')
             await reaction.message.channel.send(('Thank you for hosting a Training session, please remember your id, ' + str(reaction.message.id)) + ', in order to run more commands for your training session in the future using AltonBot')
 
 @client.event
