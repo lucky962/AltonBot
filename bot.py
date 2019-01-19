@@ -11,10 +11,10 @@ from discord.ext import *
 print(CMDPrefix)
 with open('BotToken.txt') as f:
     TOKEN = f.read()
-hostip = 'localhost'
+hostip = '192.168.0.100'
 AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
-noticechannel = 520701561564037143
-requestchannel = 528528451192356874
+noticechannel = 529987720848867328
+requestchannel = 514331989764210698
 mycursor = AltonDB.cursor(buffered=True)
 os.chdir('Dependencies')
 
@@ -35,13 +35,14 @@ class MyClient(discord.Client):
     async def my_background_task(self):
         print('automaticreminder task started')
         await self.wait_until_ready()
-        print('client is')
+        print('client is ready')
         noticechanne = self.get_channel(noticechannel)
         print(noticechanne)
         while not self.is_closed():
             AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
             mycursor = AltonDB.cursor(buffered=True)
-            mycursor.execute("SELECT * FROM `trainingsessions` WHERE `TrainingTime` < '" + str(datetime.datetime.now() - datetime.timedelta(hours=12)) + "' AND `Reminded` = 0")
+            print(str(datetime.datetime.now() - datetime.timedelta(hours=11)))
+            mycursor.execute("SELECT * FROM `trainingsessions` WHERE `TrainingTime` > '" + str(datetime.datetime.now() - datetime.timedelta(hours=11)) + "' AND `TrainingTime` < '" + str(datetime.datetime.now() - datetime.timedelta(hours=10)) + "' AND `Reminded` = 0")
             trainingreminders = mycursor.fetchall()
             for row in trainingreminders:
                 print(row)
