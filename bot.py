@@ -90,7 +90,20 @@ def tagtoid(tag, message): # Changes discord tag to id
         isd = int(tag.lstrip('<@!').lstrip('<@').rstrip('>'))
         return (str(isd))
     except ValueError:
-        return(message.guild.get_member_named(tag).id)    
+        members = message.guild.members
+        print(members)
+        member = []
+        for i in members:
+            print(i)
+            if i.nick == None:
+                if tag.lower() in i.name.lower():
+                    member.append(i.id)
+                continue
+            if tag.lower() in i.nick.lower():
+                member.append(i.id)
+            elif tag.lower() in i.name.lower():
+                member.append(i.id)
+        return(str(member[0]))
   
 @client.event
 async def on_message(message):
