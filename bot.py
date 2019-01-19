@@ -447,6 +447,7 @@ async def on_message(message):
             await client.change_presence(activity=discord.Game(name=(CMDPrefix.get(514155943525875716) if 514155943525875716 in CMDPrefix else '!') + 'help'))
         elif messege.startswith('await'):
             if message.author.id == 244596682531143680:
+                await message.delete()
                 await eval(messege[6:])
             else:
                 await message.channel.send('Sorry lucky962 is the only person who can run this command at this moment.')
