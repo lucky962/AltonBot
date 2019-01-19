@@ -41,7 +41,6 @@ class MyClient(discord.Client):
         while not self.is_closed():
             AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
             mycursor = AltonDB.cursor(buffered=True)
-            print(str(datetime.datetime.now() - datetime.timedelta(hours=11)))
             mycursor.execute("SELECT * FROM `trainingsessions` WHERE `TrainingTime` > '" + str(datetime.datetime.now() - datetime.timedelta(hours=11)) + "' AND `TrainingTime` < '" + str(datetime.datetime.now() - datetime.timedelta(hours=10)) + "' AND `Reminded` = 0")
             trainingreminders = mycursor.fetchall()
             for row in trainingreminders:
