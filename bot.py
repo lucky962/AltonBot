@@ -13,8 +13,8 @@ with open('BotToken.txt') as f:
     TOKEN = f.read()
 hostip = 'localhost'
 AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
-noticechannel = 529987720848867328
-requestchannel = 514331989764210698
+noticechannel = 520701561564037143
+requestchannel = 528528451192356874
 mycursor = AltonDB.cursor(buffered=True)
 os.chdir('Dependencies')
 
