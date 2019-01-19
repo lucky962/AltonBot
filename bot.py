@@ -13,7 +13,7 @@ with open('BotToken.txt') as f:
     TOKEN = f.read()
 hostip = 'localhost'
 AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
-noticechannel = 520701561564037143
+noticechannel = 5207015615640371439
 requestchannel = 528528451192356874
 mycursor = AltonDB.cursor(buffered=True)
 os.chdir('Dependencies')
@@ -26,7 +26,7 @@ class MyClient(discord.Client):
         self.bg_task = self.loop.create_task(self.my_background_task())
 
     async def on_ready(self):
-        await client.change_presence(activity=discord.Game(name=(CMDPrefix.get(514155943525875716) if 514155943525875716 in CMDPrefix else '!') + 'help'))
+        await self.change_presence(activity=discord.Game(name=(CMDPrefix.get(514155943525875716) if 514155943525875716 in CMDPrefix else '!') + 'help'))
         print('Logged in as')
         print(self.user.name)
         print(self.user.id)
@@ -38,7 +38,14 @@ class MyClient(discord.Client):
         print('client is ready')
         noticechanne = self.get_channel(noticechannel)
         print(noticechanne)
+        gameplaying = 0
         while not self.is_closed():
+            if gameplaying == 0:
+                await self.change_presence(activity=discord.Game(name='Alton County Railways'))
+                gameplaying = 1
+            elif gameplaying == 1:
+                await self.change_presence(activity=discord.Game(name=(CMDPrefix.get(514155943525875716) if 514155943525875716 in CMDPrefix else '!') + 'help'))
+                gameplaying = 0
             AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
             mycursor = AltonDB.cursor(buffered=True)
             mycursor.execute("SELECT * FROM `trainingsessions` WHERE `TrainingTime` > '" + str(datetime.datetime.now() - datetime.timedelta(hours=11)) + "' AND `TrainingTime` < '" + str(datetime.datetime.now() - datetime.timedelta(hours=10)) + "' AND `Reminded` = 0")
