@@ -103,6 +103,8 @@ def tagtoid(tag, message): # Changes discord tag to id
                 member.append(i.id)
             elif tag.lower() in i.name.lower():
                 member.append(i.id)
+        if len(member) > 1:
+            raise ValueError('More than one user with that in name')
         return(str(member[0]))
   
 @client.event
