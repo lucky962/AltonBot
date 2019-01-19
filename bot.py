@@ -462,6 +462,8 @@ async def on_message(message):
                 exec(message[11:])
             else:
                 await message.channel.send('Sorry lucky962 is the only person who can run this command at this moment.')
+        else:
+            await message.channel.send("Sorry, command not found. If you believe this is an error, please dm lucky9621.")
         
 
 @client.event
