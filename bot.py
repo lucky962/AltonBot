@@ -65,7 +65,10 @@ class MyClient(discord.Client):
                 currenttime = str(datetime.datetime.now() - datetime.timedelta(hours=11) - datetime.timedelta(minutes=1))
                 currenttime = datetime.datetime.strptime(currenttime, '%Y-%m-%d %H:%M:%S.%f')
                 diff = relativedelta(TrainingTime, currenttime)
-                if ('Dispatch' in trainingtype) or ('DS' in trainingtype) or ('Platform' in trainingtype) or ('PO' in trainingtype):
+                if ('Signal' in trainingtype) or ('SG' in trainingtype) or ('Control' in trainingtype) or ('CN' in trainingtype):
+                    notifiedrank = 'PLATFORM OPERATORS'
+                    trainedrank = 'Controller **[CN]**'
+                elif ('Dispatch' in trainingtype) or ('DS' in trainingtype) or ('Platform' in trainingtype) or ('PO' in trainingtype):
                     notifiedrank = 'INTERMEDIATE DRIVERS'
                     trainedrank = 'Platform Operator **[PO]**'
                 elif ('Experience' in trainingtype) or ('ED' in trainingtype) or ('Intermediate' in trainingtype) or ('ID' in trainingtype):
@@ -104,7 +107,7 @@ def tagtoid(tag, message): # Changes discord tag to id
             elif tag.lower() in i.name.lower():
                 member.append(i.id)
         if len(member) > 1:
-            raise ValueError('More than one user with that in name')
+            raise ValueError('More than one user with that in name1')
         return(str(member[0]))
   
 @client.event
@@ -147,7 +150,10 @@ async def on_message(message):
                         currenttime = str(datetime.datetime.now() - datetime.timedelta(hours=11) - datetime.timedelta(minutes=1))
                         currenttime = datetime.datetime.strptime(currenttime, '%Y-%m-%d %H:%M:%S.%f')
                         diff = relativedelta(TrainingTime, currenttime)
-                        if ('Dispatch' in trainingtype) or ('DS' in trainingtype) or ('Platform' in trainingtype) or ('PO' in trainingtype):
+                        if ('Signal' in trainingtype) or ('SG' in trainingtype) or ('Control' in trainingtype) or ('CN' in trainingtype):
+                            notifiedrank = 'PLATFORM OPERATORS'
+                            trainedrank = 'Controller **[CN]**'
+                        elif ('Dispatch' in trainingtype) or ('DS' in trainingtype) or ('Platform' in trainingtype) or ('PO' in trainingtype):
                             notifiedrank = 'INTERMEDIATE DRIVERS'
                             trainedrank = 'Platform Operator **[PO]**'
                         elif ('Experience' in trainingtype) or ('ED' in trainingtype) or ('Intermediate' in trainingtype) or ('ID' in trainingtype):
@@ -559,7 +565,9 @@ async def on_reaction_add(reaction, user):
             date = str(date)
             time = time + ' GMT'
             print('tasdfad')
-            if ('Dispatch' in trainingtype) or ('DS' in trainingtype) or ('Platform' in trainingtype) or ('PO' in trainingtype):
+            if ('Signal' in trainingtype) or ('SG' in trainingtype) or ('Control' in trainingtype) or ('CN' in trainingtype):
+                trainingtype = 'Controller Training'
+            elif ('Dispatch' in trainingtype) or ('DS' in trainingtype) or ('Platform' in trainingtype) or ('PO' in trainingtype):
                 trainingtype = 'Platform Operator Training'
                 # notifiedrank = 'INTERMEDIATE DRIVERS'
                 # trainedrank = 'Platform Operator **[PO]**'
