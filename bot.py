@@ -256,6 +256,7 @@ async def on_message(message):
             nexttrainingmsg.append('**UPCOMING PO TRAININGS**')
             for row in POtrainings:
                 nexttrainingmsg.append(row[2].strftime('%d/%m/%Y at %I:%M %p. Hosted by: ') + row[3])
+            nexttrainingmsg.append('**UPCOMING CN TRAININGS**')
             for row in CNtrainings:
                 nexttrainingmsg.append(row[2].strftime('%d/%m/%Y at %I:%M %p. Hosted by: ') + row[3])
             await message.channel.send('\n'.join(nexttrainingmsg))
