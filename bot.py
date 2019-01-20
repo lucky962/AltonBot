@@ -241,17 +241,22 @@ async def on_message(message):
             mycursor = AltonDB.cursor(buffered=True)
             IDtrainings = []
             POtrainings = []
+            CNtrainings = []
             mycursor.execute('DELETE FROM `trainingsessions` WHERE `TrainingTime` < "' + str(datetime.datetime.now() - datetime.timedelta(hours=11)) + '"')
             AltonDB.commit()
             mycursor.execute("SELECT * FROM `trainingsessions` WHERE `TrainingType` = 'Intermediate Driver Training' ORDER BY `trainingsessions`.`TrainingTime` ASC")
             IDtrainings = mycursor.fetchall()
             mycursor.execute("SELECT * FROM `trainingsessions` WHERE `TrainingType` = 'Platform Operator Training' ORDER BY `trainingsessions`.`TrainingTime` ASC")
             POtrainings = mycursor.fetchall()
+            mycursor.execute("SELECT * FROM `trainingsessions` WHERE `TrainingType` = 'Controller Training' ORDER BY `trainingsessions`.`TrainingTime` ASC")
+            CNtrainings = mycursor.fetchall()
             nexttrainingmsg = ['**UPCOMING ID TRAININGS**']
             for row in IDtrainings:
                 nexttrainingmsg.append(row[2].strftime('%d/%m/%Y at %I:%M %p. Hosted by: ') + row[3])
             nexttrainingmsg.append('**UPCOMING PO TRAININGS**')
             for row in POtrainings:
+                nexttrainingmsg.append(row[2].strftime('%d/%m/%Y at %I:%M %p. Hosted by: ') + row[3])
+            for row in CNtrainings:
                 nexttrainingmsg.append(row[2].strftime('%d/%m/%Y at %I:%M %p. Hosted by: ') + row[3])
             await message.channel.send('\n'.join(nexttrainingmsg))
         elif messege.startswith('warn '):
