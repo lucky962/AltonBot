@@ -11,7 +11,7 @@ from discord.ext import *
 print(CMDPrefix)
 with open('BotToken.txt') as f:
     TOKEN = f.read()
-hostip = '192.168.0.100'
+hostip = 'localhost'
 AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
 noticechannel = 520701561564037143
 requestchannel = 528528451192356874
