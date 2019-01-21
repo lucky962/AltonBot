@@ -2,3 +2,4 @@ BotToken.txt
 \__pycache__
 warnlist.txt
 ServerPrefixes.py
+\.vscode
