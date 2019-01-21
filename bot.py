@@ -38,8 +38,6 @@ class MyClient(discord.Client):
         await self.wait_until_ready()
         print('client is ready')
         guild = self.get_guild(guildid)
-        noticechanne = self.get_channel(noticechannel)
-        print(noticechanne)
         gameplaying = 0
         while not self.is_closed():
             if gameplaying == 0:
@@ -73,15 +71,21 @@ class MyClient(discord.Client):
                     host = str(row[3])
                 if row[4] != '':
                     try:
+                        int(row[4])
                         try:
-                            cohost = guild.get_member(int(row[4])).nick
-                            if cohost == None:
-                                raise AttributeError()
-                        except AttributeError:
-                            cohost = await self.get_user_info(int(row[4]))
-                            cohost = cohost.name
-                    except discord.errors.NotFound:
-                        cohost = str(row[4])
+                            try:
+                                cohost = guild.get_member(int(row[4])).nick
+                                if cohost == None:
+                                    raise AttributeError()
+                            except AttributeError:
+                                cohost = await self.get_user_info(int(row[4]))
+                                cohost = cohost.name
+                        except discord.errors.NotFound:
+                            cohost = str(row[4])
+                    except ValueError:
+                        cohost = row[4]
+                else:
+                    cohost = ''
                 TrainingTime = datetime.datetime.strptime(formattedtime, '%Y-%m-%d %H:%M:%S')
                 currenttime = str(datetime.datetime.now() - datetime.timedelta(hours=11) - datetime.timedelta(minutes=1))
                 currenttime = datetime.datetime.strptime(currenttime, '%Y-%m-%d %H:%M:%S.%f')
@@ -99,9 +103,8 @@ class MyClient(discord.Client):
                     trainingtype = 'Developer Training'
                     notifiedrank = 'Trainee Developer'
                     trainedrank = 'Developer'
-                print('ahsdhfadsf')
                 time = time + ' GMT'
-                await self.get_channel(noticechannel).send((((((((((((((((((((('Attention **' + notifiedrank) + "**, just a reminder that there'll be a ") + trainedrank) + ' Training in **') + str(diff.days)) + ' days, ') + str(diff.hours)) + ' hours, ') + str(diff.minutes)) + ' minutes  / ') + time) + '!** (') + date) + ') \n\nHost: ') + host) + ((' \nCo-host: ' + cohost) + '\n' if cohost != None else '\n')) + '\nThe link will be posted on the __**Group Wall or Group Shout (One Of the two)**__ **10** minutes before its scheduled time. [**') + posttime) + '**].\n\nOnce you join, please spawn as a __**passenger**__ at __**Standen Station**__ and line up __**against the ticket machines!**__\n\nThanks for reading,\n**') + row[3]) + '**')
+                await self.get_channel(noticechannel).send('Attention **' + notifiedrank + "**, just a reminder that there'll be a " + trainedrank + ' Training in **' + str(diff.days) + ' days, ' + str(diff.hours) + ' hours, ' + str(diff.minutes) + ' minutes  / ' + time + '!** (' + date + ') \n\nHost: ' + host + ' \nCo-host: ' + ((cohost + '\n') if cohost != '' else '\n') + '\nThe link will be posted on the __**Group Wall or Group Shout (One Of the two)**__ **10** minutes before its scheduled time. [**' + posttime + '**].\n\nOnce you join, please spawn as a __**passenger**__ at __**Standen Station**__ and line up __**against the ticket machines!**__\n\nThanks for reading,\n**' + host + '**')
                 mycursor.execute("UPDATE `trainingsessions` SET `Reminded` = '1' WHERE `trainingsessions`.`ID` = " + str(row[0]) + ";")
                 AltonDB.commit()
                 print('done')
@@ -668,8 +671,9 @@ async def on_reaction_add(reaction, user):
                 await reaction.message.send("Host user not found.")
             if cohost != '':
                 cohostz = tagtoid(cohost, reaction.message)
-                if cohost != None:
-                    cohost == cohostz
+                if cohostz != None:
+                    cohost = cohostz
+                    print(cohost)
             date = datetime.datetime.strptime(str(date), '%d/%m/%Y').strftime('%d %B %Y')
             date = str(date)
             time = time + ' GMT'
