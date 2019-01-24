@@ -126,6 +126,7 @@ def tagtoid(tag, message): # Changes discord tag to id
             if i.nick == None:
                 if tag.lower() in i.name.lower():
                     member.append(i.id)
+                    print('no nickname matching name')
                 continue
             if tag.lower() in i.nick.lower():
                 member.append(i.id)
@@ -675,6 +676,7 @@ async def on_reaction_add(reaction, user):
                 if cohostz != None:
                     cohost = cohostz
                     print(cohost)
+            print(host)
             date = datetime.datetime.strptime(str(date), '%d/%m/%Y').strftime('%d %B %Y')
             date = str(date)
             time = time + ' GMT'
@@ -704,6 +706,8 @@ async def on_reaction_add(reaction, user):
             mycursor.execute((((((((((('INSERT INTO trainingsessions (ID, TrainingType, TrainingTime, Host' + cohosttempz) + ") VALUES ('") + str(reaction.message.id)) + "', '") + trainingtype) + "', '") + str(TrainingTime)) + "', '") + host) + "'") + cohosttemp)
             AltonDB.commit()
             # await client.get_channel(noticechannel).send((((((((((((((((((((('Attention **' + notifiedrank) + "**, just letting you know that there'll be a ") + trainedrank) + ' Training in **') + str(diff.days)) + ' days, ') + str(diff.hours)) + ' hours, ') + str(diff.minutes)) + ' minutes  / ') + time) + '!** (') + date) + ') \n\nHost: ') + host) + ((' \nCo-host: ' + cohost) + '\n' if cohost != None else '\n')) + '\nThe link will be posted on the __**Group Wall or Group Shout (One Of the two)**__ **10** minutes before its scheduled time. [**') + posttime) + '**].\n\nOnce you join, please spawn as a __**passenger**__ at __**Standen Station**__ and line up __**against the ticket machines!**__\n\nThanks for reading,\n**') + reaction.message.author.nick) + '**')
-            await reaction.message.channel.send(('Thank you for hosting a Training session, please remember your id, ' + str(reaction.message.id)) + ', in order to run more commands for your training session in the future using AltonBot')
+            # await reaction.message.channel.send(('Thank you for hosting a Training session, please remember your id, ' + str(reaction.message.id)) + ', in order to run more commands for your training session in the future using AltonBot')
+            approvedby = await reaction.users().flatten()
+            await reaction.message.guild.get_member(int(host)).send('Thank you for hosting a(n) ' + trainingtype + TrainingTime.strftime(' at %I:%M%p on %d/%m/%Y') + '. Your training was approved by ' + approvedby[0].nick + '! Your id for this training is: ' + str(reaction.message.id))
 
 client.run(TOKEN)
