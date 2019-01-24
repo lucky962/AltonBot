@@ -11,7 +11,7 @@ from discord.ext import *
 print(CMDPrefix)
 with open('BotToken.txt') as f:
     TOKEN = f.read()
-hostip = 'localhost'
+hostip = '192.168.0.100'
 AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
 noticechannel = 520701561564037143
 requestchannel = 528528451192356874
@@ -40,7 +40,7 @@ class MyClient(discord.Client):
         guild = self.get_guild(guildid)
         gameplaying = 0
         while not self.is_closed():
-            print('checking' + datetime.datetime.now())
+            print('checking' + str(datetime.datetime.now()))
             if gameplaying == 0:
                 await self.change_presence(activity=discord.Game(name='Alton County Railways'))
                 gameplaying = 1
