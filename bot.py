@@ -282,7 +282,7 @@ async def on_message(message):
                 else:
                     await message.channel.send('Sorry, no info found. The syntax is -edittraining [id] [thing to change]: [value to change to]')
             else: 
-                await message.channel.send('Sorry, you have to be an LD+ to edit trainings.')
+                await message.channel.send('Sorry, you have to be an SD+ to edit trainings.')
         elif messege.startswith('nexttraining'):
             AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
             mycursor = AltonDB.cursor(buffered=True)
@@ -406,7 +406,7 @@ async def on_message(message):
                 except IndexError:
                     await message.channel.send('A reason is needed to issue a warning.')
             else:
-                await message.channel.send('Sorry, you have to be an LD+ to warn.')
+                await message.channel.send('Sorry, you have to be an SD+ to warn.')
         elif messege.startswith('kick '):           
             roles = []
             for i in message.author.roles:
@@ -427,7 +427,7 @@ async def on_message(message):
                 except IndexError:
                     await message.channel.send('A reason is needed to kick.')
             else:
-                await message.channel.send('Sorry, you have to be an LD+ to kick.')
+                await message.channel.send('Sorry, you have to be an SD+ to kick.')
         elif messege.startswith('ban '):
             roles = []
             for i in message.author.roles:
@@ -519,27 +519,27 @@ async def on_message(message):
                     nickname = nickname.name
                 await message.channel.send('Successfully cleared ' + str(noofwarns) + ' warnings for ' + nickname)
             else:
-                await message.channel.send('You have to be an LD+ to clear warnings.')
+                await message.channel.send('You have to be an SD+ to clear warnings.')
         elif messege.lower().startswith('ldappresponse'):
             await message.channel.send("Sorry, this function isn't ready just yet, please try again later!")
         elif messege.lower().startswith('help moderation'):
             HelpMsg = discord.Embed(title='Help Page', description='This is a page full of moderation commands you can use with AltonBot', color=3447003)
             HelpMsg.set_author(name='Alton Bot', icon_url=client.user.avatar_url)
-            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'warn [user]', value='**LD+ Only** - warns a user')
-            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'kick [user]', value='**LD+ Only** - kicks a user')
+            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'warn [user]', value='**SD+ Only** - warns a user')
+            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'kick [user]', value='**SD+ Only** - kicks a user')
             HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'ban [user]', value='**MOD+ Only** - bans a user indefinetely or until unbanned.')
             HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'warnings [user(optional)]', value='Displays all warnings currently stored in memory or just for the user.')
-            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'clearwarnings [user]', value='**LD+ Only** - clears the warnings of a certain player.')
+            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'clearwarnings [user]', value='**SD+ Only** - clears the warnings of a certain player.')
             HelpMsg.set_footer(icon_url=client.user.avatar_url, text='© Alton County Railways')
             await message.channel.send(embed=HelpMsg)
         elif messege.lower().startswith('help training'):
             HelpMsg = discord.Embed(title='Help Page', description='This is a page full of training commands you can use with AltonBot', color=3447003)
             HelpMsg.set_author(name='Alton Bot', icon_url=client.user.avatar_url)
             HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'nexttraining', value='Shows upcoming training sessions.')
-            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'trainingreminder [id]', value='**LD+ Only** - Sends a training reminder about the specified training.')
-            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'edittraining [id] [fieldtochange]: [valuetochangeto]', value='**LD+ Only** - edits training session specified **Currently in BETA**')
-            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'canceltraining [id]', value='**LD+ Only** - deletes training session specified.')
-            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'mytrainings', value='**LD+ Only** - Displays your hosted training sessions. **COMING SOON**')
+            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'trainingreminder [id]', value='**SD+ Only** - Sends a training reminder about the specified training.')
+            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'edittraining [id] [fieldtochange]: [valuetochangeto]', value='**SD+ Only** - edits training session specified **Currently in BETA**')
+            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'canceltraining [id]', value='**SD+ Only** - deletes training session specified.')
+            HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'mytrainings', value='**SD+ Only** - Displays your hosted training sessions. **COMING SOON**')
             HelpMsg.set_footer(icon_url=client.user.avatar_url, text='© Alton County Railways')
             await message.channel.send(embed=HelpMsg)
         elif messege.lower().startswith('help other'):
