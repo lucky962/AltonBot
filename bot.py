@@ -8,110 +8,18 @@ import asyncio
 import traceback
 from dateutil.relativedelta import relativedelta
 from Dependencies.ServerPrefixes import *
-from discord.ext import *
+from discord.ext import commands
 print(CMDPrefix)
 with open('BotToken.txt') as f:
     TOKEN = f.read()
-hostip = 'localhost'
+hostip = '192.168.0.100'
 AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
 noticechannel = 520701561564037143
 requestchannel = 528528451192356874
 guildid = 514155943525875716
 mycursor = AltonDB.cursor(buffered=True)
 os.chdir('Dependencies')
-
-class MyClient(discord.Client):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # create the background task and run it in the background
-        self.bg_task = self.loop.create_task(self.my_background_task())
-
-    async def on_ready(self):
-        await self.change_presence(activity=discord.Game(name=(CMDPrefix.get(514155943525875716) if 514155943525875716 in CMDPrefix else '!') + 'help'))
-        print('Logged in as')
-        print(self.user.name)
-        print(self.user.id)
-        print('------')
-
-    async def my_background_task(self):
-        print('automaticreminder task started')
-        await self.wait_until_ready()
-        print('client is ready')
-        guild = self.get_guild(guildid)
-        gameplaying = 0
-        while not self.is_closed():
-            if gameplaying == 0:
-                await self.change_presence(activity=discord.Game(name='Alton County Railways'))
-                gameplaying = 1
-            elif gameplaying == 1:
-                await self.change_presence(activity=discord.Game(name=(CMDPrefix.get(514155943525875716) if 514155943525875716 in CMDPrefix else '!') + 'help'))
-                gameplaying = 0
-            AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
-            mycursor = AltonDB.cursor(buffered=True)
-            mycursor.execute("SELECT * FROM `trainingsessions` WHERE `TrainingTime` > '" + str(datetime.datetime.now() - datetime.timedelta(hours=11)) + "' AND `TrainingTime` < '" + str(datetime.datetime.now() - datetime.timedelta(hours=10)) + "' AND `Reminded` = 0")
-            trainingreminders = mycursor.fetchall()
-            for row in trainingreminders:
-                print(row)
-                trainingtype = row[1]
-                print(trainingtype)
-                time = datetime.datetime.strptime(str(row[2])[11:16], '%H:%M')
-                posttime = (time - datetime.timedelta(minutes=10)).strftime('%I:%M %p')
-                time = str(time.strftime('%I:%M %p'))
-                date = str(datetime.datetime.strptime(str(row[2])[:10], '%Y-%m-%d').strftime('%d %B %Y'))
-                formattedtime = str(row[2])
-                try:
-                    try:
-                        host = guild.get_member(int(row[3])).nick
-                        if host == None:
-                            raise AttributeError()
-                    except AttributeError:
-                        host = await self.get_user_info(int(row[3]))
-                        host = host.name
-                except discord.errors.NotFound:
-                    host = str(row[3])
-                if row[4] != '':
-                    try:
-                        int(row[4])
-                        try:
-                            try:
-                                cohost = guild.get_member(int(row[4])).nick
-                                if cohost == None:
-                                    raise AttributeError()
-                            except AttributeError:
-                                cohost = await self.get_user_info(int(row[4]))
-                                cohost = cohost.name
-                        except discord.errors.NotFound:
-                            cohost = str(row[4])
-                    except ValueError:
-                        cohost = row[4]
-                else:
-                    cohost = ''
-                TrainingTime = datetime.datetime.strptime(formattedtime, '%Y-%m-%d %H:%M:%S')
-                currenttime = str(datetime.datetime.now() - datetime.timedelta(hours=11) - datetime.timedelta(minutes=1))
-                currenttime = datetime.datetime.strptime(currenttime, '%Y-%m-%d %H:%M:%S.%f')
-                diff = relativedelta(TrainingTime, currenttime)
-                if ('Signal' in trainingtype) or ('SG' in trainingtype) or ('Control' in trainingtype) or ('CN' in trainingtype):
-                    notifiedrank = 'PLATFORM OPERATORS'
-                    trainedrank = 'Controller **[CN]**'
-                elif ('Dispatch' in trainingtype) or ('DS' in trainingtype) or ('Platform' in trainingtype) or ('PO' in trainingtype):
-                    notifiedrank = 'INTERMEDIATE DRIVERS'
-                    trainedrank = 'Platform Operator **[PO]**'
-                elif ('Experience' in trainingtype) or ('ED' in trainingtype) or ('Intermediate' in trainingtype) or ('ID' in trainingtype):
-                    notifiedrank = 'NOVICE DRIVERS'
-                    trainedrank = 'Intermediate Driver **[ID]**'
-                elif 'Dev' in trainingtype:
-                    trainingtype = 'Developer Training'
-                    notifiedrank = 'Trainee Developer'
-                    trainedrank = 'Developer'
-                time = time + ' GMT'
-                await self.get_channel(noticechannel).send('Attention **' + notifiedrank + "**, just a reminder that there'll be a " + trainedrank + ' Training in **' + str(diff.days) + ' days, ' + str(diff.hours) + ' hours, ' + str(diff.minutes) + ' minutes  / ' + time + '!** (' + date + ') \n\nHost: ' + host + ' \nCo-host: ' + ((cohost + '\n') if cohost != '' else '\n') + '\nThe link will be posted on the __**Group Wall or Group Shout (One Of the two)**__ **10** minutes before its scheduled time. [**' + posttime + '**].\n\nOnce you join, please spawn as a __**passenger**__ at __**Standen Station**__ and line up __**against the ticket machines!**__\n\nThanks for reading,\n**' + host + '**')
-                mycursor.execute("UPDATE `trainingsessions` SET `Reminded` = '1' WHERE `trainingsessions`.`ID` = " + str(row[0]) + ";")
-                AltonDB.commit()
-                print('done')
-            await asyncio.sleep(10)
-
-client = MyClient()
+bot = commands.Bot(command_prefix='-', description='This is a moderation/training management bot made for AltonBot')
 
 def tagtoid(tag, message): # Changes discord tag to id
     try:
@@ -137,12 +45,98 @@ def tagtoid(tag, message): # Changes discord tag to id
         else:
             return(str(member[0]))
 
-@client.event
+async def my_background_task():
+    print('automaticreminder task started')
+    await bot.wait_until_ready()
+    print('bot is ready')
+    guild = bot.get_guild(guildid)
+    gameplaying = 0
+    while not bot.is_closed():
+        print('checking')
+        if gameplaying == 0:
+            await bot.change_presence(activity=discord.Game(name='Alton County Railways'))
+            gameplaying = 1
+        elif gameplaying == 1:
+            await bot.change_presence(activity=discord.Game(name=(CMDPrefix.get(514155943525875716) if 514155943525875716 in CMDPrefix else '!') + 'help'))
+            gameplaying = 0
+        AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
+        mycursor = AltonDB.cursor(buffered=True)
+        mycursor.execute("SELECT * FROM `trainingsessions` WHERE `TrainingTime` > '" + str(datetime.datetime.now() - datetime.timedelta(hours=11)) + "' AND `TrainingTime` < '" + str(datetime.datetime.now() - datetime.timedelta(hours=10)) + "' AND `Reminded` = 0")
+        trainingreminders = mycursor.fetchall()
+        for row in trainingreminders:
+            print(row)
+            trainingtype = row[1]
+            print(trainingtype)
+            time = datetime.datetime.strptime(str(row[2])[11:16], '%H:%M')
+            posttime = (time - datetime.timedelta(minutes=10)).strftime('%I:%M %p')
+            time = str(time.strftime('%I:%M %p'))
+            date = str(datetime.datetime.strptime(str(row[2])[:10], '%Y-%m-%d').strftime('%d %B %Y'))
+            formattedtime = str(row[2])
+            try:
+                try:
+                    host = guild.get_member(int(row[3])).nick
+                    if host == None:
+                        raise AttributeError()
+                except AttributeError:
+                    host = await bot.get_user_info(int(row[3]))
+                    host = host.name
+            except discord.errors.NotFound:
+                host = str(row[3])
+            if row[4] != '':
+                try:
+                    int(row[4])
+                    try:
+                        try:
+                            cohost = guild.get_member(int(row[4])).nick
+                            if cohost == None:
+                                raise AttributeError()
+                        except AttributeError:
+                            cohost = await bot.get_user_info(int(row[4]))
+                            cohost = cohost.name
+                    except discord.errors.NotFound:
+                        cohost = str(row[4])
+                except ValueError:
+                    cohost = row[4]
+            else:
+                cohost = ''
+            TrainingTime = datetime.datetime.strptime(formattedtime, '%Y-%m-%d %H:%M:%S')
+            currenttime = str(datetime.datetime.now() - datetime.timedelta(hours=11) - datetime.timedelta(minutes=1))
+            currenttime = datetime.datetime.strptime(currenttime, '%Y-%m-%d %H:%M:%S.%f')
+            diff = relativedelta(TrainingTime, currenttime)
+            if ('Signal' in trainingtype) or ('SG' in trainingtype) or ('Control' in trainingtype) or ('CN' in trainingtype):
+                notifiedrank = 'PLATFORM OPERATORS'
+                trainedrank = 'Controller **[CN]**'
+            elif ('Dispatch' in trainingtype) or ('DS' in trainingtype) or ('Platform' in trainingtype) or ('PO' in trainingtype):
+                notifiedrank = 'INTERMEDIATE DRIVERS'
+                trainedrank = 'Platform Operator **[PO]**'
+            elif ('Experience' in trainingtype) or ('ED' in trainingtype) or ('Intermediate' in trainingtype) or ('ID' in trainingtype):
+                notifiedrank = 'NOVICE DRIVERS'
+                trainedrank = 'Intermediate Driver **[ID]**'
+            elif 'Dev' in trainingtype:
+                trainingtype = 'Developer Training'
+                notifiedrank = 'Trainee Developer'
+                trainedrank = 'Developer'
+            time = time + ' GMT'
+            await bot.get_channel(noticechannel).send('Attention **' + notifiedrank + "**, just a reminder that there'll be a " + trainedrank + ' Training in **' + str(diff.days) + ' days, ' + str(diff.hours) + ' hours, ' + str(diff.minutes) + ' minutes  / ' + time + '!** (' + date + ') \n\nHost: ' + host + ' \nCo-host: ' + ((cohost + '\n') if cohost != '' else '\n') + '\nThe link will be posted on the __**Group Wall or Group Shout (One Of the two)**__ **10** minutes before its scheduled time. [**' + posttime + '**].\n\nOnce you join, please spawn as a __**passenger**__ at __**Standen Station**__ and line up __**against the ticket machines!**__\n\nThanks for reading,\n**' + host + '**')
+            mycursor.execute("UPDATE `trainingsessions` SET `Reminded` = '1' WHERE `trainingsessions`.`ID` = " + str(row[0]) + ";")
+            AltonDB.commit()
+            print('done')
+        await asyncio.sleep(10)
+
+@bot.event
+async def on_ready():
+    await bot.change_presence(activity=discord.Game(name=(CMDPrefix.get(514155943525875716) if 514155943525875716 in CMDPrefix else '!') + 'help'))
+    print('Logged in as')
+    print(bot.user.name)
+    print(bot.user.id)
+    print('------')
+
+@bot.event
 async def on_message(message):
     print(message.author)
     print(message.content)
     try:
-        if message.author == client.user:
+        if message.author == bot.user:
             return
         if message.content.startswith(CMDPrefix.get(message.guild.id)):
             await message.channel.trigger_typing()
@@ -178,7 +172,7 @@ async def on_message(message):
                                     if host == None:
                                         raise AttributeError()
                                 except AttributeError:
-                                    host = await client.get_user_info(int(row[3]))
+                                    host = await bot.get_user_info(int(row[3]))
                                     host = host.name
                             except discord.errors.NotFound:
                                 host = str(row[3])
@@ -190,7 +184,7 @@ async def on_message(message):
                                         if cohost == None:
                                             raise AttributeError()
                                     except AttributeError:
-                                        cohost = await client.get_user_info(int(row[4]))
+                                        cohost = await bot.get_user_info(int(row[4]))
                                         cohost = cohost.name
                                 except discord.errors.NotFound:
                                     cohost = str(row[4])
@@ -215,7 +209,7 @@ async def on_message(message):
                                 await message.channel.send('Sorry, your trainingtype is not found. Please tell @lucky962#0599, if you would like him to add a new trainingytpe.')
                             print('ahsdhfadsf')
                             time = time + ' GMT'
-                            await client.get_channel(noticechannel).send((((((((((((((((((((('Attention **' + notifiedrank) + "**, just a reminder that there'll be a ") + trainedrank) + ' Training in **') + str(diff.days)) + ' days, ') + str(diff.hours)) + ' hours, ') + str(diff.minutes)) + ' minutes  / ') + time) + '!** (') + date) + ') \n\nHost: ') + host) + ((' \nCo-host: ' + cohost) + '\n' if cohost != None else '\n')) + '\nThe link will be posted on the __**Group Wall or Group Shout (One Of the two)**__ **10** minutes before its scheduled time. [**') + posttime) + '**].\n\nOnce you join, please spawn as a __**passenger**__ at __**Standen Station**__ and line up __**against the ticket machines!**__\n\nThanks for reading,\n**') + message.author.nick) + '**')
+                            await bot.get_channel(noticechannel).send((((((((((((((((((((('Attention **' + notifiedrank) + "**, just a reminder that there'll be a ") + trainedrank) + ' Training in **') + str(diff.days)) + ' days, ') + str(diff.hours)) + ' hours, ') + str(diff.minutes)) + ' minutes  / ') + time) + '!** (') + date) + ') \n\nHost: ') + host) + ((' \nCo-host: ' + cohost) + '\n' if cohost != None else '\n')) + '\nThe link will be posted on the __**Group Wall or Group Shout (One Of the two)**__ **10** minutes before its scheduled time. [**') + posttime) + '**].\n\nOnce you join, please spawn as a __**passenger**__ at __**Standen Station**__ and line up __**against the ticket machines!**__\n\nThanks for reading,\n**') + message.author.nick) + '**')
                             await message.channel.send('Reminder sent!')
             elif messege.startswith('canceltraining '):
                 roles = []
@@ -328,7 +322,7 @@ async def on_message(message):
                             if host == None:
                                 raise AttributeError()
                         except AttributeError:
-                            host = await client.get_user_info(int(row[3]))
+                            host = await bot.get_user_info(int(row[3]))
                             host = host.name
                         except ValueError:
                             host = str(row[3])
@@ -342,7 +336,7 @@ async def on_message(message):
                             if host == None:
                                 raise AttributeError()
                         except AttributeError:
-                            host = await client.get_user_info(int(row[3]))
+                            host = await bot.get_user_info(int(row[3]))
                             host = host.name
                         except ValueError:
                             host = str(row[3])
@@ -350,10 +344,10 @@ async def on_message(message):
                         host = str(row[3])
                     nextPOtrainings.append(row[2].strftime('%d/%m/%Y at %I:%M %p. Hosted by: ') + host + (' [ID: ' + str(row[0]) + ']' if HR == True else ""))
                 nexttrainingmsg = discord.Embed(description='Showing upcoming training sessions up to 1 week from now!', color=3447003)
-                nexttrainingmsg.set_author(name='Upcoming Training Sessions', icon_url=client.user.avatar_url)
+                nexttrainingmsg.set_author(name='Upcoming Training Sessions', icon_url=bot.user.avatar_url)
                 nexttrainingmsg.add_field(name='Upcoming ID Trainings', value=('\n'.join(nextIDtrainings) if len(nextIDtrainings) > 0 else '\a'), inline=False)
                 nexttrainingmsg.add_field(name='Upcoming PO Trainings', value=('\n'.join(nextPOtrainings) if len(nextPOtrainings) > 0 else '\a'), inline=False)
-                nexttrainingmsg.set_footer(icon_url=client.user.avatar_url, text='Nexttraining list generated at: ' + str(datetime.datetime.now() - datetime.timedelta(hours=11)))
+                nexttrainingmsg.set_footer(icon_url=bot.user.avatar_url, text='Nexttraining list generated at: ' + str(datetime.datetime.now() - datetime.timedelta(hours=11)))
                 await message.channel.send(embed=nexttrainingmsg)
             elif messege.startswith('mytraining'):
                 AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
@@ -373,10 +367,10 @@ async def on_message(message):
                 for row in trainingsessions:
                     cohostedtrainingsessions.append(row[1] + ' at ' + row[2].strftime('%d/%m/%Y at %I:%M %p'))
                 hostedtrainingmsg = discord.Embed(description='Showing hosted/co-hosted training sessions for: ' + message.guild.get_member(int(user)).nick, color=3447003)
-                hostedtrainingmsg.set_author(name='Upcoming Training Sessions', icon_url=client.user.avatar_url)
+                hostedtrainingmsg.set_author(name='Upcoming Training Sessions', icon_url=bot.user.avatar_url)
                 hostedtrainingmsg.add_field(name='Hosted Trainings', value=(('\n'.join(hostedtrainingsessions)) if len(hostedtrainingsessions) > 0 else '\a'), inline=False)
                 hostedtrainingmsg.add_field(name='Co-hosted Trainings', value=('\n'.join(cohostedtrainingsessions) if len(cohostedtrainingsessions) > 0 else '\a'), inline=False)
-                hostedtrainingmsg.set_footer(icon_url=client.user.avatar_url, text='Hosted trainings list generated at: ' + str(datetime.datetime.now() - datetime.timedelta(hours=11)))
+                hostedtrainingmsg.set_footer(icon_url=bot.user.avatar_url, text='Hosted trainings list generated at: ' + str(datetime.datetime.now() - datetime.timedelta(hours=11)))
                 await message.channel.send(embed=hostedtrainingmsg)
             elif messege.startswith('alltraining'):
                 AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
@@ -397,7 +391,7 @@ async def on_message(message):
                             if host == None:
                                 raise AttributeError()
                         except AttributeError:
-                            host = await client.get_user_info(int(row[3]))
+                            host = await bot.get_user_info(int(row[3]))
                             host = host.name
                     except discord.errors.NotFound:
                         host = str(row[3])
@@ -407,7 +401,7 @@ async def on_message(message):
                             if cohost == None:
                                 raise AttributeError()
                         except AttributeError:
-                            cohost = await client.get_user_info(int(row[4]))
+                            cohost = await bot.get_user_info(int(row[4]))
                             cohost = cohost.name
                         except ValueError:
                             cohost = row[4]
@@ -530,7 +524,7 @@ async def on_message(message):
                                 if warned == None:
                                     raise AttributeError()
                             except AttributeError:
-                                warned = await client.get_user_info(int(row[1]))
+                                warned = await bot.get_user_info(int(row[1]))
                                 warned = warned.name
                         except discord.errors.NotFound:
                             warned = str(row[1])
@@ -540,7 +534,7 @@ async def on_message(message):
                                 if warner == None:
                                     raise AttributeError()
                             except AttributeError:
-                                warner = await client.get_user_info(int(row[2]))
+                                warner = await bot.get_user_info(int(row[2]))
                                 warner = warner.name
                         except discord.errors.NotFound:
                             warner = str(row[2])
@@ -565,51 +559,52 @@ async def on_message(message):
                         nickname = message.guild.get_member(int(part[1])).nick
                     except AttributeError:
                         try:
-                            nickname = await client.get_user_info(int(part[1]))
+                            nickname = await bot.get_user_info(int(part[1]))
                             nickname = nickname.name
                         except discord.errors.NotFound:
                             nickname = str(part[1])
                     if nickname == None:
-                        nickname = await client.get_user_info(int(part[1]))
+                        nickname = await bot.get_user_info(int(part[1]))
                         nickname = nickname.name
                     await message.channel.send('Successfully cleared ' + str(noofwarns) + ' warnings for ' + nickname)
                 else:
                     await message.channel.send('You have to be an SD+ to clear warnings.')
             elif messege.lower().startswith('help moderation'):
                 HelpMsg = discord.Embed(title='Help Page', description='This is a page full of moderation commands you can use with AltonBot', color=3447003)
-                HelpMsg.set_author(name='Alton Bot', icon_url=client.user.avatar_url)
+                HelpMsg.set_author(name='Alton Bot', icon_url=bot.user.avatar_url)
                 HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'warn [user]', value='**SD+ Only** - warns a user')
                 HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'kick [user]', value='**SD+ Only** - kicks a user')
                 HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'ban [user]', value='**MOD+ Only** - bans a user indefinetely or until unbanned.')
                 HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'warnings [user(optional)]', value='Displays all warnings currently stored in memory or just for the user.')
                 HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'clearwarnings [user]', value='**SD+ Only** - clears the warnings of a certain player.')
-                HelpMsg.set_footer(icon_url=client.user.avatar_url, text='© Alton County Railways')
+                HelpMsg.set_footer(icon_url=bot.user.avatar_url, text='© Alton County Railways')
                 await message.channel.send(embed=HelpMsg)
             elif messege.lower().startswith('help training'):
                 HelpMsg = discord.Embed(title='Help Page', description='This is a page full of training commands you can use with AltonBot', color=3447003)
-                HelpMsg.set_author(name='Alton Bot', icon_url=client.user.avatar_url)
+                HelpMsg.set_author(name='Alton Bot', icon_url=bot.user.avatar_url)
                 HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'nexttrainings', value='Shows upcoming training sessions.')
                 HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'trainingreminder [id]', value='**SD+ Only** - Sends a training reminder about the specified training.')
                 HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'edittraining [id] [fieldtochange]: [valuetochangeto]', value='**SD+ Only** - edits training session specified **Currently in BETA**')
                 HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'canceltraining [id]', value='**SD+ Only** - deletes training session specified.')
                 HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'mytrainings [user(optional)]', value='**SD+ Only** - Displays user\'s or your hosted training sessions.')
                 HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'alltrainings', value='Displays all training sessions.')
-                HelpMsg.set_footer(icon_url=client.user.avatar_url, text='© Alton County Railways')
+                HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'endtraining [id] [passeduser1] [passeduser2]...', value='**SD+ Only** Sends a message to training notices that training has ended and automatically promotes users specified. **COMING SOON**')
+                HelpMsg.set_footer(icon_url=bot.user.avatar_url, text='© Alton County Railways')
                 await message.channel.send(embed=HelpMsg)
             elif messege.lower().startswith('help other'):
                 HelpMsg = discord.Embed(title='Help Page', description='This is a page full of other commands you can use with AltonBot', color=3447003)
-                HelpMsg.set_author(name='Alton Bot', icon_url=client.user.avatar_url)
+                HelpMsg.set_author(name='Alton Bot', icon_url=bot.user.avatar_url)
                 HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'help', value='Displays a help page.')
                 HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'prefix', value='Changes the prefix for commands')
-                HelpMsg.set_footer(icon_url=client.user.avatar_url, text='© Alton County Railways')
+                HelpMsg.set_footer(icon_url=bot.user.avatar_url, text='© Alton County Railways')
                 await message.channel.send(embed=HelpMsg)
             elif messege.startswith('help'):
                 HelpMsg = discord.Embed(title='Help Page', description='There are two types of commands you can use with AltonBot. \nPlease type ' + CMDPrefix.get(message.guild.id) + 'help [type] to see help for a certain type of command', color=3447003)
-                HelpMsg.set_author(name='Alton Bot', icon_url=client.user.avatar_url)
+                HelpMsg.set_author(name='Alton Bot', icon_url=bot.user.avatar_url)
                 HelpMsg.add_field(name='Moderation', value='This includes all the commands that warn, ban and kick users.')
                 HelpMsg.add_field(name='Trainings', value='This includes all the commands that the bot can do in regards to trainings')
                 HelpMsg.add_field(name='Other', value='This includes any other commands that AltonBot can do')
-                HelpMsg.set_footer(icon_url=client.user.avatar_url, text='© Alton County Railways')
+                HelpMsg.set_footer(icon_url=bot.user.avatar_url, text='© Alton County Railways')
                 await message.channel.send(embed=HelpMsg)
             elif messege.startswith('prefix'):
                 if len(messege) < 8:
@@ -632,7 +627,7 @@ async def on_message(message):
                         for (key, val) in CMDPrefix.items():
                             f.write(((("    '" + key) + "':'") + val) + "',\n")
                         f.write('}\n')
-                await client.change_presence(activity=discord.Game(name=(CMDPrefix.get(514155943525875716) if 514155943525875716 in CMDPrefix else '!') + 'help'))
+                await bot.change_presence(activity=discord.Game(name=(CMDPrefix.get(514155943525875716) if 514155943525875716 in CMDPrefix else '!') + 'help'))
             elif messege.startswith('await'):
                 if message.author.id == 244596682531143680:
                     await message.delete()
@@ -644,19 +639,19 @@ async def on_message(message):
                     exec(message[11:])
                 else:
                     await message.channel.send('Sorry lucky962 is the only person who can run this command at this moment.')
-            else:
-                await message.channel.send("Sorry, command not found. If you believe this is an error, please dm lucky9621.")
         elif message.content.startswith('?warn') or message.content.startswith('?kick') or message.content.startswith('?ban'):
             await message.channel.send('Please use AltonBot for this operation.')
     except:
         await message.channel.send((traceback.format_exc().replace('leote','username')).split('\n')[-2])
+    await bot.process_commands(message)
         
+# I'm going to try using commands extension from now on, it might be better.        
 
-@client.event
+@bot.event
 async def on_reaction_add(reaction, user):
     try:
         if reaction.emoji == '✅':
-            if reaction.message.channel == client.get_channel(requestchannel):
+            if reaction.message.channel == bot.get_channel(requestchannel):
                 trainingtype = time = host = cohost = ''
                 try:
                     trainingtype = re.search('Type:(.*)\n', reaction.message.content).group(1).strip('*').strip(' ')
@@ -764,11 +759,16 @@ async def on_reaction_add(reaction, user):
                 mycursor = AltonDB.cursor(buffered=True)
                 mycursor.execute((((((((((('INSERT INTO trainingsessions (ID, TrainingType, TrainingTime, Host' + cohosttempz) + ") VALUES ('") + str(reaction.message.id)) + "', '") + trainingtype) + "', '") + str(TrainingTime)) + "', '") + host) + "'") + cohosttemp)
                 AltonDB.commit()
-                # await client.get_channel(noticechannel).send((((((((((((((((((((('Attention **' + notifiedrank) + "**, just letting you know that there'll be a ") + trainedrank) + ' Training in **') + str(diff.days)) + ' days, ') + str(diff.hours)) + ' hours, ') + str(diff.minutes)) + ' minutes  / ') + time) + '!** (') + date) + ') \n\nHost: ') + host) + ((' \nCo-host: ' + cohost) + '\n' if cohost != None else '\n')) + '\nThe link will be posted on the __**Group Wall or Group Shout (One Of the two)**__ **10** minutes before its scheduled time. [**') + posttime) + '**].\n\nOnce you join, please spawn as a __**passenger**__ at __**Standen Station**__ and line up __**against the ticket machines!**__\n\nThanks for reading,\n**') + reaction.message.author.nick) + '**')
+                # await bot.get_channel(noticechannel).send((((((((((((((((((((('Attention **' + notifiedrank) + "**, just letting you know that there'll be a ") + trainedrank) + ' Training in **') + str(diff.days)) + ' days, ') + str(diff.hours)) + ' hours, ') + str(diff.minutes)) + ' minutes  / ') + time) + '!** (') + date) + ') \n\nHost: ') + host) + ((' \nCo-host: ' + cohost) + '\n' if cohost != None else '\n')) + '\nThe link will be posted on the __**Group Wall or Group Shout (One Of the two)**__ **10** minutes before its scheduled time. [**') + posttime) + '**].\n\nOnce you join, please spawn as a __**passenger**__ at __**Standen Station**__ and line up __**against the ticket machines!**__\n\nThanks for reading,\n**') + reaction.message.author.nick) + '**')
                 # await reaction.message.channel.send(('Thank you for hosting a Training session, please remember your id, ' + str(reaction.message.id)) + ', in order to run more commands for your training session in the future using AltonBot')
                 approvedby = await reaction.users().flatten()
                 await reaction.message.guild.get_member(int(host)).send('Thank you for hosting a(n) ' + trainingtype + TrainingTime.strftime(' at %I:%M%p on %d/%m/%Y') + '. Your training was approved by ' + approvedby[0].nick + '! Your id for this training is: ' + str(reaction.message.id))
     except:
         await reaction.message.channel.send((traceback.format_exc().replace('leote','username')).split('\n')[-2])
 
-client.run(TOKEN)
+@bot.command()
+async def test(ctx, arg):
+    await ctx.send(arg)
+
+bot.loop.create_task(my_background_task())
+bot.run(TOKEN)
