@@ -361,7 +361,7 @@ async def on_message(message):
                 if len(messege.split(' ')) > 1:
                     user = tagtoid(messege.split(' ')[1], message)
                 else:
-                    user = message.author.id
+                    user = str(message.author.id)
                 mycursor.execute("SELECT * FROM `trainingsessions` WHERE `Host` = '" + user + "' ORDER BY `trainingsessions`.`TrainingTime` ASC;")
                 trainingsessions = mycursor.fetchall()
                 hostedtrainingsessions = []
@@ -413,12 +413,8 @@ async def on_message(message):
                             cohost = row[4]
                     except discord.errors.NotFound:
                         cohost = str(row[4])
-                    msg.append(row[1] + row[2].strftime('at %I:%M %p on %d/%m/%Y. Hosted by: ') + host + ' Co-hosted by: ' + (cohost if cohost != '' else 'None') + (' [ID: ' + str(row[0]) + ']' if HR == True else ""))
-                alltrainingmsg = discord.Embed(description='Showing all training sessions since v0.3.0', color=3447003)
-                alltrainingmsg.set_author(name='All Training Sessions', icon_url=client.user.avatar_url)
-                alltrainingmsg.add_field(name='All Trainings', value=('\n'.join(msg) if len(msg) > 0 else '\a'), inline=False)
-                alltrainingmsg.set_footer(icon_url=client.user.avatar_url, text='Alltrainings list generated at: ' + str(datetime.datetime.now() - datetime.timedelta(hours=11)))
-                await message.channel.send(embed=alltrainingmsg)
+                    msg.append('**' + row[1] + '**' + row[2].strftime(' at **%I:%M %p** on **%d/%m/%Y**. Hosted by: **') + host + '** Co-hosted by: **' + (cohost if cohost != '' else 'None') + ('** [ID: ' + str(row[0]) + ']' if HR == True else ""))
+                await message.channel.send('\n'.join(msg))
             elif messege.startswith('warn '):
                 roles = []
                 for i in message.author.roles:
@@ -652,7 +648,7 @@ async def on_message(message):
         elif message.content.startswith('?warn') or message.content.startswith('?kick') or message.content.startswith('?ban'):
             await message.channel.send('Please use AltonBot for this operation.')
     except:
-        await message.channel.send((traceback.format_exc().replace('leote','username')))
+        await message.channel.send((traceback.format_exc().replace('leote','username')).split('\n')[-2])
         
 
 @client.event
