@@ -1,5 +1,6 @@
 import discord
 import os
+import sys
 import re
 import datetime
 import mysql.connector
@@ -12,7 +13,7 @@ from discord.ext import commands
 print(CMDPrefix)
 with open('BotToken.txt') as f:
     TOKEN = f.read()
-hostip = 'localhost'
+hostip = '192.168.0.100'
 AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
 noticechannel = 520701561564037143
 requestchannel = 528528451192356874
@@ -21,6 +22,7 @@ mycursor = AltonDB.cursor(buffered=True)
 os.chdir('Dependencies')
 bot = commands.Bot(command_prefix='-')
 bot.remove_command('help')
+bot.hostip = hostip
 
 def tagtoid(tag, message): # Changes discord tag to id
     try:
@@ -45,6 +47,7 @@ def tagtoid(tag, message): # Changes discord tag to id
             return None
         else:
             return(str(member[0]))
+bot.tagtoid = tagtoid
 
 async def my_background_task():
     print('automaticreminder task started')
@@ -211,18 +214,6 @@ async def on_message(message):
                             time = time + ' GMT'
                             await bot.get_channel(noticechannel).send((((((((((((((((((((('Attention **' + notifiedrank) + "**, just a reminder that there'll be a ") + trainedrank) + ' Training in **') + str(diff.days)) + ' days, ') + str(diff.hours)) + ' hours, ') + str(diff.minutes)) + ' minutes  / ') + time) + '!** (') + date) + ') \n\nHost: ') + host) + ((' \nCo-host: ' + cohost) + '\n' if cohost != None else '\n')) + '\nThe link will be posted on the __**Group Wall or Group Shout (One Of the two)**__ **10** minutes before its scheduled time. [**') + posttime) + '**].\n\nOnce you join, please spawn as a __**passenger**__ at __**Standen Station**__ and line up __**against the ticket machines!**__\n\nThanks for reading,\n**') + message.author.nick) + '**')
                             await message.channel.send('Reminder sent!')
-            elif messege.startswith('canceltraining '):
-                roles = []
-                for i in message.author.roles:
-                    roles.append(i.name)
-                print(roles)
-                if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
-                    trainingid = messege[15:]
-                    AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
-                    mycursor = AltonDB.cursor(buffered=True)
-                    mycursor.execute('DELETE FROM `trainingsessions` WHERE `ID` = ' + trainingid)
-                    AltonDB.commit()
-                    await message.channel.send('Successfully cancelled ' + str(mycursor.rowcount) + ' training session(s)')
             elif messege.startswith('edittraining'):
                 roles = []
                 for i in message.author.roles:
@@ -409,53 +400,6 @@ async def on_message(message):
                         cohost = str(row[4])
                     msg.append('**' + row[1] + '**' + row[2].strftime(' at **%I:%M %p** on **%d/%m/%Y**. Hosted by: **') + host + '** Co-hosted by: **' + (cohost if cohost != '' else 'None') + ('** [ID: ' + str(row[0]) + ']' if HR == True else ""))
                 await message.channel.send('\n'.join(msg))
-            elif messege.startswith('warn '):
-                roles = []
-                for i in message.author.roles:
-                    roles.append(i.name)
-                print(roles)
-                if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
-                    warning = messege.split(' ', maxsplit=2)
-                    warning[1] = tagtoid(warning[1], message)
-                    AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
-                    mycursor = AltonDB.cursor(buffered=True)
-                    try:
-                        mycursor.execute("INSERT INTO warnlist (Warned, Warner, Reason) VALUES ('" + warning[1] + "', '" + str(message.author.id) + "', '" + warning[2] + "');")
-                        AltonDB.commit()
-                        mycursor.execute("SELECT * FROM `warnlist` WHERE `Warned` = '" + warning[1] + "'")
-                        noofwarns = mycursor.rowcount
-                        await message.channel.send((((('<@' + warning[1]) + '> has been warned for: ') + warning[2]) + '. This is warning number ') + str(noofwarns))
-                        try:
-                            await message.guild.get_member(int(warning[1])).send('You have been warned from Alton County Railways for: ' + warning[2])
-                        except discord.errors.Forbidden:
-                            pass
-                        if (noofwarns == 3) or (noofwarns == 6):
-                            try:
-                                await message.channel.send(((('<@' + warning[1]) + '> will now be kicked for having ') + str(noofwarns)) + ' warnings.')
-                                try:
-                                    await message.guild.get_member(int(warning[1])).send(('You have been kicked from Alton County Railways for having ' + str(noofwarns)) + ' warnings.')
-                                except discord.errors.Forbidden:
-                                    pass
-                                await message.guild.kick(message.guild.get_member(int(warning[1])), reason=str(noofwarns) + ' warnings')
-                            except discord.errors.Forbidden:
-                                await message.channel.send("Sorry, I don't have the permissions to kick that user.")
-                        elif (noofwarns > 8):
-                            try:
-                                await message.channel.send(((('<@' + warning[1]) + '> will now be banned for having ') + str(noofwarns)) + ' warnings.')
-                                try:
-                                    await message.guild.get_member(int(warning[1])).send(('You have been banned from Alton County Railways for having ' + str(noofwarns)) + ' warnings.')
-                                except discord.errors.Forbidden:
-                                    pass
-                                await message.guild.ban(message.guild.get_member(int(warning[1])), reason=str(noofwarns) + ' warnings')
-                                mycursor.execute("INSERT INTO warnlist (Banned, Banner, Reason) VALUES ('" + warning[1] + "', '" + str(message.author.id) + "', '" + str(noofwarns) + " warnings');")
-                                AltonDB.commit()
-                            except discord.errors.Forbidden:
-                                await message.channel.send("Sorry, I don't have the permissions to ban that user.")
-
-                    except IndexError:
-                        await message.channel.send('A reason is needed to issue a warning.')
-                else:
-                    await message.channel.send('Sorry, you have to be an SD+ to warn.')
             elif messege.startswith('kick '):
                 roles = []
                 for i in message.author.roles:
@@ -644,8 +588,7 @@ async def on_message(message):
     except:
         await message.channel.send((traceback.format_exc().replace('leote','username')).split('\n')[-2])
     await bot.process_commands(message)
-        
-# I'm going to try using commands extension from now on, it might be better.        
+         
 
 @bot.event
 async def on_reaction_add(reaction, user):
@@ -765,6 +708,21 @@ async def on_reaction_add(reaction, user):
                 await reaction.message.guild.get_member(int(host)).send('Thank you for hosting a(n) ' + trainingtype + TrainingTime.strftime(' at %I:%M%p on %d/%m/%Y') + '. Your training was approved by ' + approvedby[0].nick + '! Your id for this training is: ' + str(reaction.message.id))
     except:
         await reaction.message.channel.send((traceback.format_exc().replace('leote','username')).split('\n')[-2])
+
+# I'm thinking of migrating to use the commands extension nearly everything below this should be parts of the code that have been migrated
+
+initial_extensions = ['cogs.error_handler',
+                      'cogs.training_commands',
+                      'cogs.moderation_commands']
+
+if __name__ == '__main__':
+    for extension in initial_extensions:
+        try:
+            bot.load_extension(extension)
+            print(f'Successully loaded extension {extension}.', file=sys.stderr)
+        except Exception as e:
+            print(f'Failed to load extension {extension}.', file=sys.stderr)
+            traceback.print_exc()
 
 @bot.command()
 async def endtraining(ctx):
