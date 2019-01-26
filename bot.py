@@ -361,7 +361,7 @@ async def on_message(message):
                 if len(messege.split(' ')) > 1:
                     user = tagtoid(messege.split(' ')[1], message)
                 else:
-                    user = message.author.id
+                    user = str(message.author.id)
                 mycursor.execute("SELECT * FROM `trainingsessions` WHERE `Host` = '" + user + "' ORDER BY `trainingsessions`.`TrainingTime` ASC;")
                 trainingsessions = mycursor.fetchall()
                 hostedtrainingsessions = []
@@ -378,6 +378,43 @@ async def on_message(message):
                 hostedtrainingmsg.add_field(name='Co-hosted Trainings', value=('\n'.join(cohostedtrainingsessions) if len(cohostedtrainingsessions) > 0 else '\a'), inline=False)
                 hostedtrainingmsg.set_footer(icon_url=client.user.avatar_url, text='Hosted trainings list generated at: ' + str(datetime.datetime.now() - datetime.timedelta(hours=11)))
                 await message.channel.send(embed=hostedtrainingmsg)
+            elif messege.startswith('alltraining'):
+                AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
+                mycursor = AltonDB.cursor(buffered=True)
+                HR=False
+                roles = []
+                for i in message.author.roles:
+                    roles.append(i.name)
+                if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
+                    HR = True
+                mycursor.execute("SELECT * FROM `trainingsessions` ORDER BY `trainingsessions`.`Host` ASC")
+                msg = []
+                alltrainings = mycursor.fetchall()
+                for row in alltrainings:
+                    try:
+                        try:
+                            host = message.guild.get_member(int(row[3])).nick
+                            if host == None:
+                                raise AttributeError()
+                        except AttributeError:
+                            host = await client.get_user_info(int(row[3]))
+                            host = host.name
+                    except discord.errors.NotFound:
+                        host = str(row[3])
+                    try:
+                        try:
+                            cohost = message.guild.get_member(int(row[4])).nick
+                            if cohost == None:
+                                raise AttributeError()
+                        except AttributeError:
+                            cohost = await client.get_user_info(int(row[4]))
+                            cohost = cohost.name
+                        except ValueError:
+                            cohost = row[4]
+                    except discord.errors.NotFound:
+                        cohost = str(row[4])
+                    msg.append('**' + row[1] + '**' + row[2].strftime(' at **%I:%M %p** on **%d/%m/%Y**. Hosted by: **') + host + '** Co-hosted by: **' + (cohost if cohost != '' else 'None') + ('** [ID: ' + str(row[0]) + ']' if HR == True else ""))
+                await message.channel.send('\n'.join(msg))
             elif messege.startswith('warn '):
                 roles = []
                 for i in message.author.roles:
@@ -425,7 +462,7 @@ async def on_message(message):
                         await message.channel.send('A reason is needed to issue a warning.')
                 else:
                     await message.channel.send('Sorry, you have to be an SD+ to warn.')
-            elif messege.startswith('kick '):           
+            elif messege.startswith('kick '):
                 roles = []
                 for i in message.author.roles:
                     roles.append(i.name)
@@ -538,8 +575,6 @@ async def on_message(message):
                     await message.channel.send('Successfully cleared ' + str(noofwarns) + ' warnings for ' + nickname)
                 else:
                     await message.channel.send('You have to be an SD+ to clear warnings.')
-            elif messege.lower().startswith('ldappresponse'):
-                await message.channel.send("Sorry, this function isn't ready just yet, please try again later!")
             elif messege.lower().startswith('help moderation'):
                 HelpMsg = discord.Embed(title='Help Page', description='This is a page full of moderation commands you can use with AltonBot', color=3447003)
                 HelpMsg.set_author(name='Alton Bot', icon_url=client.user.avatar_url)
@@ -553,7 +588,7 @@ async def on_message(message):
             elif messege.lower().startswith('help training'):
                 HelpMsg = discord.Embed(title='Help Page', description='This is a page full of training commands you can use with AltonBot', color=3447003)
                 HelpMsg.set_author(name='Alton Bot', icon_url=client.user.avatar_url)
-                HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'nexttraining', value='Shows upcoming training sessions.')
+                HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'nexttrainings', value='Shows upcoming training sessions.')
                 HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'trainingreminder [id]', value='**SD+ Only** - Sends a training reminder about the specified training.')
                 HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'edittraining [id] [fieldtochange]: [valuetochangeto]', value='**SD+ Only** - edits training session specified **Currently in BETA**')
                 HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'canceltraining [id]', value='**SD+ Only** - deletes training session specified.')
