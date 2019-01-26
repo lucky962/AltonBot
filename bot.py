@@ -52,7 +52,6 @@ async def my_background_task():
     guild = bot.get_guild(guildid)
     gameplaying = 0
     while not bot.is_closed():
-        print('checking')
         if gameplaying == 0:
             await bot.change_presence(activity=discord.Game(name='Alton County Railways'))
             gameplaying = 1
