@@ -24,19 +24,6 @@ class CommandErrorHandler:
 
         elif isinstance(error, commands.errors.CheckFailure):
             return await ctx.send('You don\'t have enough permissions to run this command')
-
-        elif isinstance(error, commands.DisabledCommand):
-            return await ctx.send(f'{ctx.command} has been disabled.')
-
-        elif isinstance(error, commands.NoPrivateMessage):
-            try:
-                return await ctx.author.send(f'{ctx.command} can not be used in Private Messages.')
-            except:
-                pass
-
-        elif isinstance(error, commands.BadArgument):
-            if ctx.command.qualified_name == 'tag list':
-                return await ctx.send('I could not find that member. Please try again.')
             
         print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
         traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
