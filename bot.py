@@ -12,7 +12,7 @@ from discord.ext import *
 print(CMDPrefix)
 with open('BotToken.txt') as f:
     TOKEN = f.read()
-hostip = '192.168.0.100'
+hostip = 'localhost'
 AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
 noticechannel = 520701561564037143
 requestchannel = 528528451192356874
@@ -413,7 +413,7 @@ async def on_message(message):
                             cohost = row[4]
                     except discord.errors.NotFound:
                         cohost = str(row[4])
-                    msg.append(row[2].strftime('%d/%m/%Y at %I:%M %p. Hosted by: ') + host + ' Co-hosted by: ' + (cohost if cohost != '' else 'None') + (' [ID: ' + str(row[0]) + ']' if HR == True else ""))
+                    msg.append(row[1] + row[2].strftime('at %I:%M %p on %d/%m/%Y. Hosted by: ') + host + ' Co-hosted by: ' + (cohost if cohost != '' else 'None') + (' [ID: ' + str(row[0]) + ']' if HR == True else ""))
                 alltrainingmsg = discord.Embed(description='Showing all training sessions since v0.3.0', color=3447003)
                 alltrainingmsg.set_author(name='All Training Sessions', icon_url=client.user.avatar_url)
                 alltrainingmsg.add_field(name='All Trainings', value=('\n'.join(msg) if len(msg) > 0 else '\a'), inline=False)
