@@ -592,7 +592,8 @@ async def on_message(message):
                 HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'trainingreminder [id]', value='**SD+ Only** - Sends a training reminder about the specified training.')
                 HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'edittraining [id] [fieldtochange]: [valuetochangeto]', value='**SD+ Only** - edits training session specified **Currently in BETA**')
                 HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'canceltraining [id]', value='**SD+ Only** - deletes training session specified.')
-                HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'mytrainings', value='**SD+ Only** - Displays your hosted training sessions. **COMING SOON**')
+                HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'mytrainings', value='**SD+ Only** - Displays your hosted training sessions.')
+                HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'alltrainings', value='Displays all training sessions.')
                 HelpMsg.set_footer(icon_url=client.user.avatar_url, text='© Alton County Railways')
                 await message.channel.send(embed=HelpMsg)
             elif messege.lower().startswith('help other'):
