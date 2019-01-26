@@ -12,7 +12,7 @@ from discord.ext import *
 print(CMDPrefix)
 with open('BotToken.txt') as f:
     TOKEN = f.read()
-hostip = 'localhost'
+hostip = '192.168.0.100'
 AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
 noticechannel = 520701561564037143
 requestchannel = 528528451192356874
@@ -358,17 +358,21 @@ async def on_message(message):
             elif messege.startswith('mytraining'):
                 AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
                 mycursor = AltonDB.cursor(buffered=True)
-                mycursor.execute("SELECT * FROM `trainingsessions` WHERE `Host` = '" + str(message.author.id) + "' ORDER BY `trainingsessions`.`TrainingTime` ASC;")
+                if len(messege.split(' ')) > 1:
+                    user = tagtoid(messege.split(' ')[1], message)
+                else:
+                    user = message.author.id
+                mycursor.execute("SELECT * FROM `trainingsessions` WHERE `Host` = '" + user + "' ORDER BY `trainingsessions`.`TrainingTime` ASC;")
                 trainingsessions = mycursor.fetchall()
                 hostedtrainingsessions = []
                 cohostedtrainingsessions = []
                 for row in trainingsessions:
                     hostedtrainingsessions.append(row[1] + ' at ' + row[2].strftime('%d/%m/%Y at %I:%M %p'))
-                mycursor.execute("SELECT * FROM `trainingsessions` WHERE `Cohost` = '" + str(message.author.id) + "' ORDER BY `trainingsessions`.`TrainingTime` ASC;")
+                mycursor.execute("SELECT * FROM `trainingsessions` WHERE `Cohost` = '" + user + "' ORDER BY `trainingsessions`.`TrainingTime` ASC;")
                 trainingsessions = mycursor.fetchall()
                 for row in trainingsessions:
                     cohostedtrainingsessions.append(row[1] + ' at ' + row[2].strftime('%d/%m/%Y at %I:%M %p'))
-                hostedtrainingmsg = discord.Embed(description='Showing hosted/co-hosted training sessions!', color=3447003)
+                hostedtrainingmsg = discord.Embed(description='Showing hosted/co-hosted training sessions for: ' + message.guild.get_member(int(user)).nick, color=3447003)
                 hostedtrainingmsg.set_author(name='Upcoming Training Sessions', icon_url=client.user.avatar_url)
                 hostedtrainingmsg.add_field(name='Hosted Trainings', value=(('\n'.join(hostedtrainingsessions)) if len(hostedtrainingsessions) > 0 else '\a'), inline=False)
                 hostedtrainingmsg.add_field(name='Co-hosted Trainings', value=('\n'.join(cohostedtrainingsessions) if len(cohostedtrainingsessions) > 0 else '\a'), inline=False)
