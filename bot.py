@@ -19,7 +19,8 @@ requestchannel = 528528451192356874
 guildid = 514155943525875716
 mycursor = AltonDB.cursor(buffered=True)
 os.chdir('Dependencies')
-bot = commands.Bot(command_prefix='-', description='This is a moderation/training management bot made for AltonBot')
+bot = commands.Bot(command_prefix='-')
+bot.remove_command('help')
 
 def tagtoid(tag, message): # Changes discord tag to id
     try:
@@ -766,8 +767,8 @@ async def on_reaction_add(reaction, user):
         await reaction.message.channel.send((traceback.format_exc().replace('leote','username')).split('\n')[-2])
 
 @bot.command()
-async def test(ctx, arg):
-    await ctx.send(arg)
+async def endtraining(ctx):
+    await ctx.send('Endtraining command coming soon! Keep your eyes peeled!')
 
 bot.loop.create_task(my_background_task())
 bot.run(TOKEN)
