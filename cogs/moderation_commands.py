@@ -131,9 +131,9 @@ class ModerationCommands:
                 warner = str(row[2])
             print('*' + warned + '* was warned by *' + warner + '* for reason: ' + row[3])
             msg.append('*' + warned + '* was warned by *' + warner + '* for reason: ' + row[3])
-        try:
+        if len(msg) > 0:
             await ctx.send('\n'.join(msg))
-        except discord.errors.HTTPException:
+        else:
             await ctx.send('This user has no warnings.')
 
     @commands.command(name='clearwarnings', aliases=['clearwarn','clearwarning','clearwarns'], description='**SD+ Only** - clears the warnings of a certain player.', brief='clears the warnings of a certain player.')
