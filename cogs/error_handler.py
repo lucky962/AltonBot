@@ -28,15 +28,15 @@ class CommandErrorHandler:
         print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
         traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
     
-    @commands.command(name='repeat', aliases=['mimic', 'copy'])
-    async def do_repeat(self, ctx, *, inp: str):
-        await ctx.send(inp)
+    # @commands.command(name='repeat', aliases=['mimic', 'copy'])
+    # async def do_repeat(self, ctx, *, inp: str):
+    #     await ctx.send(inp)
 
-    @do_repeat.error
-    async def do_repeat_handler(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            if error.param.name == 'inp':
-                await ctx.send("You forgot to give me input to repeat!")
+    # @do_repeat.error
+    # async def do_repeat_handler(self, ctx, error):
+    #     if isinstance(error, commands.MissingRequiredArgument):
+    #         if error.param.name == 'inp':
+    #             await ctx.send("You forgot to give me input to repeat!")
                 
 
 def setup(bot):

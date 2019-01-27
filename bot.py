@@ -13,7 +13,7 @@ from discord.ext import commands
 print(CMDPrefix)
 with open('BotToken.txt') as f:
     TOKEN = f.read()
-hostip = 'localhost'
+hostip = '192.168.0.100'
 AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
 noticechannel = 520701561564037143
 requestchannel = 528528451192356874
@@ -21,8 +21,9 @@ guildid = 514155943525875716
 mycursor = AltonDB.cursor(buffered=True)
 os.chdir('Dependencies')
 bot = commands.Bot(command_prefix='-')
-bot.remove_command('help')
 bot.hostip = hostip
+bot.noticechannel = noticechannel
+bot.requestchannel = requestchannel
 
 def tagtoid(tag, message): # Changes discord tag to id
     try:
@@ -138,455 +139,8 @@ async def on_ready():
 async def on_message(message):
     print(message.author)
     print(message.content)
-    try:
-        if message.author == bot.user:
-            return
-        if message.content.startswith(CMDPrefix.get(message.guild.id)):
-            await message.channel.trigger_typing()
-            print('COMMAND DETECTED')
-            messege = message.content[len(CMDPrefix.get(message.guild.id)):]
-            if messege.startswith('hello'):
-                msg = 'Hello {0.author.mention}'.format(message)
-                await message.channel.send(msg)
-            elif messege.startswith('trainingreminder '):
-                roles = []
-                for i in message.author.roles:
-                    roles.append(i.name)
-                print(roles)
-                if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
-                    print('TRAININGREMINDER')
-                    trainingid = (messege[17:])
-                    AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
-                    mycursor = AltonDB.cursor(buffered=True)
-                    mycursor.execute('SELECT * FROM trainingsessions')
-                    for row in mycursor.fetchall():
-                        if str(row[0]) == trainingid:
-                            print('FOUND ONE')
-                            trainingtype = row[1]
-                            print(trainingtype)
-                            time = datetime.datetime.strptime(str(row[2])[11:16], '%H:%M')
-                            posttime = (time - datetime.timedelta(minutes=10)).strftime('%I:%M %p')
-                            time = str(time.strftime('%I:%M %p'))
-                            date = str(datetime.datetime.strptime(str(row[2])[:10], '%Y-%m-%d').strftime('%d %B %Y'))
-                            formattedtime = str(row[2])
-                            try:
-                                try:
-                                    host = message.guild.get_member(int(row[3])).nick
-                                    if host == None:
-                                        raise AttributeError()
-                                except AttributeError:
-                                    host = await bot.get_user_info(int(row[3]))
-                                    host = host.name
-                            except discord.errors.NotFound:
-                                host = str(row[3])
-                            cohost = ''
-                            if row[4] != '':
-                                try:
-                                    try:
-                                        cohost = message.guild.get_member(int(row[4])).nick
-                                        if cohost == None:
-                                            raise AttributeError()
-                                    except AttributeError:
-                                        cohost = await bot.get_user_info(int(row[4]))
-                                        cohost = cohost.name
-                                except discord.errors.NotFound:
-                                    cohost = str(row[4])
-                            TrainingTime = datetime.datetime.strptime(formattedtime, '%Y-%m-%d %H:%M:%S')
-                            currenttime = str(datetime.datetime.now() - datetime.timedelta(hours=11) - datetime.timedelta(minutes=1))
-                            currenttime = datetime.datetime.strptime(currenttime, '%Y-%m-%d %H:%M:%S.%f')
-                            diff = relativedelta(TrainingTime, currenttime)
-                            if ('Signal' in trainingtype) or ('SG' in trainingtype) or ('Control' in trainingtype) or ('CN' in trainingtype):
-                                notifiedrank = 'PLATFORM OPERATORS'
-                                trainedrank = 'Controller **[CN]**'
-                            elif ('Dispatch' in trainingtype) or ('DS' in trainingtype) or ('Platform' in trainingtype) or ('PO' in trainingtype):
-                                notifiedrank = 'INTERMEDIATE DRIVERS'
-                                trainedrank = 'Platform Operator **[PO]**'
-                            elif ('Experience' in trainingtype) or ('ED' in trainingtype) or ('Intermediate' in trainingtype) or ('ID' in trainingtype):
-                                notifiedrank = 'NOVICE DRIVERS'
-                                trainedrank = 'Intermediate Driver **[ID]**'
-                            elif 'Dev' in trainingtype:
-                                trainingtype = 'Developer Training'
-                                notifiedrank = 'Trainee Developer'
-                                trainedrank = 'Developer'
-                            else:
-                                await message.channel.send('Sorry, your trainingtype is not found. Please tell @lucky962#0599, if you would like him to add a new trainingytpe.')
-                            print('ahsdhfadsf')
-                            time = time + ' GMT'
-                            await bot.get_channel(noticechannel).send((((((((((((((((((((('Attention **' + notifiedrank) + "**, just a reminder that there'll be a ") + trainedrank) + ' Training in **') + str(diff.days)) + ' days, ') + str(diff.hours)) + ' hours, ') + str(diff.minutes)) + ' minutes  / ') + time) + '!** (') + date) + ') \n\nHost: ') + host) + ((' \nCo-host: ' + cohost) + '\n' if cohost != None else '\n')) + '\nThe link will be posted on the __**Group Wall or Group Shout (One Of the two)**__ **10** minutes before its scheduled time. [**') + posttime) + '**].\n\nOnce you join, please spawn as a __**passenger**__ at __**Standen Station**__ and line up __**against the ticket machines!**__\n\nThanks for reading,\n**') + message.author.nick) + '**')
-                            await message.channel.send('Reminder sent!')
-            elif messege.startswith('edittraining'):
-                roles = []
-                for i in message.author.roles:
-                    roles.append(i.name)
-                print(roles)
-                if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
-                    AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
-                    mycursor = AltonDB.cursor(buffered=True)
-                    await message.channel.send('Edittraining command still in early development, there may be a few bugs!')
-                    trainingid = (messege.split(' '))[1]
-                    part = message.content.split(':', maxsplit=1)
-                    newinfo = part[1].strip(' ')
-                    print(newinfo)
-                    if 'co-host' in messege.lower() or 'cohost' in messege.lower():
-                        mycursor.execute("UPDATE `trainingsessions` SET `Cohost` = '" + newinfo + "' WHERE `trainingsessions`.`ID` = " + trainingid + ";")
-                        AltonDB.commit()
-                        await message.channel.send('Successfully updated Co-host to ' + newinfo)
-                    elif 'host' in messege.lower():
-                        mycursor.execute("UPDATE `trainingsessions` SET `Host` = '" + newinfo + "' WHERE `trainingsessions`.`ID` = " + trainingid + ";")
-                        AltonDB.commit()
-                        await message.channel.send('Successfully updated Host to ' + newinfo)
-                    elif 'type' in messege.lower():
-                        if ('Dispatch' in newinfo) or ('DS' in newinfo) or ('Platform' in newinfo) or ('PO' in newinfo):
-                            newinfo = 'Platform Operator Training'
-                        elif ('Experience' in newinfo) or ('ED' in newinfo) or ('Intermediate' in newinfo) or ('ID' in newinfo):
-                            newinfo = 'Intermediate Driver Training'
-                        else:
-                            await message.channel.send('Training type not recognised. Error will most likely occur when posting a training notice.')
-                        mycursor.execute("UPDATE `trainingsessions` SET `TrainingType` = '" + newinfo + "' WHERE `trainingsessions`.`ID` = " + trainingid + ";")
-                        AltonDB.commit()
-                        await message.channel.send('Successfully updated TrainingType to ' + newinfo)
-                    elif 'time' in messege.lower():
-                        AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
-                        mycursor = AltonDB.cursor(buffered=True)
-                        mycursor.execute("SELECT TrainingTime from `trainingsessions` WHERE `trainingsessions`.`ID` = " + trainingid + ";")
-                        date = datetime.datetime.strptime(str(mycursor.fetchall()[0][0]).split(' ')[0], '%Y-%m-%d').strftime('%d/%m/%Y')
-                        if ('pm' in newinfo.lower()) or ('am' in newinfo.lower()):
-                            newinfo = newinfo.replace(' ', '')
-                            newinfo = (date + ' ') + newinfo
-                            TrainingTime = datetime.datetime.strptime(newinfo, '%d/%m/%Y %I:%M%p')
-                        elif (not (':' in newinfo)):
-                            if len(newinfo) == 4:
-                                newinfo = time = (newinfo[:2] + ':') + newinfo[2:]
-                            elif len(newinfo) == 3:
-                                newinfo = time = (('0' + newinfo[:1]) + ':') + newinfo[1:]
-                            newinfo = (date + ' ') + newinfo
-                            TrainingTime = datetime.datetime.strptime(newinfo, '%d/%m/%Y %H:%M')
-                        elif ':' in newinfo:
-                            newinfo = (date + ' ') + newinfo
-                            TrainingTime = datetime.datetime.strptime(newinfo, '%d/%m/%Y %H:%M')
-                        TrainingTime = str(TrainingTime)
-                        mycursor.execute("UPDATE `trainingsessions` SET `TrainingTime` = '" + TrainingTime + "' WHERE `trainingsessions`.`ID` = " + trainingid + ";")
-                        AltonDB.commit()
-                        await message.channel.send('Time successfully updated to ' + TrainingTime.split(' ')[1])
-                    elif 'date' in messege.lower():
-                        AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
-                        mycursor = AltonDB.cursor(buffered=True)
-                        mycursor.execute("SELECT TrainingTime from `trainingsessions` WHERE `trainingsessions`.`ID` = " + trainingid + ";")
-                        date = datetime.datetime.strptime(str(mycursor.fetchall()[0][0]).split(' ')[1], '%H:%M:%S').strftime('%H:%M')
-                        newinfo = str(datetime.datetime.strptime(newinfo, '%d/%m/%Y').strftime('%Y-%m-%d'))
-                        date = newinfo + ' ' + date
-                        mycursor.execute("UPDATE `trainingsessions` SET `TrainingTime` = '" + date + "' WHERE `trainingsessions`.`ID` = " + trainingid + ";")
-                        AltonDB.commit()
-                        await message.channel.send('Date successfully updated to ' + date.split(' ')[0] + ' (YYYY-MM-DD)')                    
-                    else:
-                        await message.channel.send('Sorry, no info found. The syntax is -edittraining [id] [thing to change]: [value to change to]')
-                else: 
-                    await message.channel.send('Sorry, you have to be an SD+ to edit trainings.')
-            elif messege.startswith('nexttraining'):
-                AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
-                mycursor = AltonDB.cursor(buffered=True)
-                IDtrainings = []
-                POtrainings = []
-                nextIDtrainings = []
-                nextPOtrainings = []
-                roles=[]
-                HR=False
-                for i in message.author.roles:
-                    roles.append(i.name)
-                if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
-                    HR = True
-                mycursor.execute("SELECT * FROM `trainingsessions` WHERE `TrainingType` = 'Intermediate Driver Training' AND '" + str(datetime.datetime.now() - datetime.timedelta(hours=11) + datetime.timedelta(days=7)) + "' > `TrainingTime` AND `TrainingTime` > '" + str(datetime.datetime.now() - datetime.timedelta(hours=11)) + "'ORDER BY `trainingsessions`.`TrainingTime` ASC;")
-                IDtrainings = mycursor.fetchall()
-                mycursor.execute("SELECT * FROM `trainingsessions` WHERE `TrainingType` = 'Platform Operator Training' AND '" + str(datetime.datetime.now() - datetime.timedelta(hours=11) + datetime.timedelta(days=7)) + "' > `TrainingTime` AND `TrainingTime` > '" + str(datetime.datetime.now() - datetime.timedelta(hours=11)) + "'ORDER BY `trainingsessions`.`TrainingTime` ASC;")
-                POtrainings = mycursor.fetchall()
-                # nexttrainingmsg = ['**UPCOMING ID TRAININGS**']
-                # for row in IDtrainings:
-                #     nexttrainingmsg.append(row[2].strftime('%d/%m/%Y at %I:%M %p. Hosted by: ') + row[3])
-                # nexttrainingmsg.append('**UPCOMING PO TRAININGS**')
-                # for row in POtrainings:
-                #     nexttrainingmsg.append(row[2].strftime('%d/%m/%Y at %I:%M %p. Hosted by: ') + row[3])
-                # await message.channel.send('\n'.join(nexttrainingmsg))
-                for row in IDtrainings:
-                    try:
-                        try:
-                            host = message.guild.get_member(int(row[3])).nick
-                            if host == None:
-                                raise AttributeError()
-                        except AttributeError:
-                            host = await bot.get_user_info(int(row[3]))
-                            host = host.name
-                        except ValueError:
-                            host = str(row[3])
-                    except discord.errors.NotFound:
-                        host = str(row[3])
-                    nextIDtrainings.append(row[2].strftime('%d/%m/%Y at %I:%M %p. Hosted by: ') + host + (' [ID: ' + str(row[0]) + ']' if HR == True else ""))
-                for row in POtrainings:
-                    try:
-                        try:
-                            host = message.guild.get_member(int(row[3])).nick
-                            if host == None:
-                                raise AttributeError()
-                        except AttributeError:
-                            host = await bot.get_user_info(int(row[3]))
-                            host = host.name
-                        except ValueError:
-                            host = str(row[3])
-                    except discord.errors.NotFound:
-                        host = str(row[3])
-                    nextPOtrainings.append(row[2].strftime('%d/%m/%Y at %I:%M %p. Hosted by: ') + host + (' [ID: ' + str(row[0]) + ']' if HR == True else ""))
-                nexttrainingmsg = discord.Embed(description='Showing upcoming training sessions up to 1 week from now!', color=3447003)
-                nexttrainingmsg.set_author(name='Upcoming Training Sessions', icon_url=bot.user.avatar_url)
-                nexttrainingmsg.add_field(name='Upcoming ID Trainings', value=('\n'.join(nextIDtrainings) if len(nextIDtrainings) > 0 else '\a'), inline=False)
-                nexttrainingmsg.add_field(name='Upcoming PO Trainings', value=('\n'.join(nextPOtrainings) if len(nextPOtrainings) > 0 else '\a'), inline=False)
-                nexttrainingmsg.set_footer(icon_url=bot.user.avatar_url, text='Nexttraining list generated at: ' + str(datetime.datetime.now() - datetime.timedelta(hours=11)))
-                await message.channel.send(embed=nexttrainingmsg)
-            elif messege.startswith('mytraining'):
-                AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
-                mycursor = AltonDB.cursor(buffered=True)
-                if len(messege.split(' ')) > 1:
-                    user = tagtoid(messege.split(' ')[1], message)
-                else:
-                    user = str(message.author.id)
-                mycursor.execute("SELECT * FROM `trainingsessions` WHERE `Host` = '" + user + "' ORDER BY `trainingsessions`.`TrainingTime` ASC;")
-                trainingsessions = mycursor.fetchall()
-                hostedtrainingsessions = []
-                cohostedtrainingsessions = []
-                for row in trainingsessions:
-                    hostedtrainingsessions.append(row[1] + ' at ' + row[2].strftime('%d/%m/%Y at %I:%M %p'))
-                mycursor.execute("SELECT * FROM `trainingsessions` WHERE `Cohost` = '" + user + "' ORDER BY `trainingsessions`.`TrainingTime` ASC;")
-                trainingsessions = mycursor.fetchall()
-                for row in trainingsessions:
-                    cohostedtrainingsessions.append(row[1] + ' at ' + row[2].strftime('%d/%m/%Y at %I:%M %p'))
-                hostedtrainingmsg = discord.Embed(description='Showing hosted/co-hosted training sessions for: ' + message.guild.get_member(int(user)).nick, color=3447003)
-                hostedtrainingmsg.set_author(name='Upcoming Training Sessions', icon_url=bot.user.avatar_url)
-                hostedtrainingmsg.add_field(name='Hosted Trainings', value=(('\n'.join(hostedtrainingsessions)) if len(hostedtrainingsessions) > 0 else '\a'), inline=False)
-                hostedtrainingmsg.add_field(name='Co-hosted Trainings', value=('\n'.join(cohostedtrainingsessions) if len(cohostedtrainingsessions) > 0 else '\a'), inline=False)
-                hostedtrainingmsg.set_footer(icon_url=bot.user.avatar_url, text='Hosted trainings list generated at: ' + str(datetime.datetime.now() - datetime.timedelta(hours=11)))
-                await message.channel.send(embed=hostedtrainingmsg)
-            elif messege.startswith('alltraining'):
-                AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
-                mycursor = AltonDB.cursor(buffered=True)
-                HR=False
-                roles = []
-                for i in message.author.roles:
-                    roles.append(i.name)
-                if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
-                    HR = True
-                mycursor.execute("SELECT * FROM `trainingsessions` ORDER BY `trainingsessions`.`Host` ASC")
-                msg = []
-                alltrainings = mycursor.fetchall()
-                for row in alltrainings:
-                    try:
-                        try:
-                            host = message.guild.get_member(int(row[3])).nick
-                            if host == None:
-                                raise AttributeError()
-                        except AttributeError:
-                            host = await bot.get_user_info(int(row[3]))
-                            host = host.name
-                    except discord.errors.NotFound:
-                        host = str(row[3])
-                    try:
-                        try:
-                            cohost = message.guild.get_member(int(row[4])).nick
-                            if cohost == None:
-                                raise AttributeError()
-                        except AttributeError:
-                            cohost = await bot.get_user_info(int(row[4]))
-                            cohost = cohost.name
-                        except ValueError:
-                            cohost = row[4]
-                    except discord.errors.NotFound:
-                        cohost = str(row[4])
-                    msg.append('**' + row[1] + '**' + row[2].strftime(' at **%I:%M %p** on **%d/%m/%Y**. Hosted by: **') + host + '** Co-hosted by: **' + (cohost if cohost != '' else 'None') + ('** [ID: ' + str(row[0]) + ']' if HR == True else ""))
-                await message.channel.send('\n'.join(msg))
-            elif messege.startswith('kick '):
-                roles = []
-                for i in message.author.roles:
-                    roles.append(i.name)
-                print(roles)
-                if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
-                    kickinfo = messege.split(' ', maxsplit=2)
-                    try:
-                        kickinfo[1] = tagtoid(kickinfo[1], message)
-                        await message.channel.send(((('<@' + kickinfo[1]) + '> has been kicked for: ') + kickinfo[2]) + '.')
-                        try:
-                            await message.guild.get_member(int(kickinfo[1])).send('You have been kicked from Alton County Railways for: ' + kickinfo[2])
-                        except discord.errors.Forbidden:
-                            pass
-                        await message.guild.kick(message.guild.get_member(int(kickinfo[1])), reason=kickinfo[2])
-                    except discord.errors.Forbidden:
-                        await message.channel.send('I do not have permission to kick this user.')
-                    except IndexError:
-                        await message.channel.send('A reason is needed to kick.')
-                else:
-                    await message.channel.send('Sorry, you have to be an SD+ to kick.')
-            elif messege.startswith('ban '):
-                roles = []
-                for i in message.author.roles:
-                    roles.append(i.name)
-                print(roles)
-                if ('Executive Team' in roles) or ('Management Team' in roles):
-                    baninfo = messege.split(' ', maxsplit=2)
-                    baninfo[1] = tagtoid(baninfo[1], message)
-                    AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
-                    mycursor = AltonDB.cursor(buffered=True)
-                    try:
-                        await message.channel.send(((('<@' + baninfo[1]) + '> has been banned for: ') + baninfo[2]) + '.')
-                        try:
-                            await message.guild.get_member(int(baninfo[1])).send('You have been banned from Alton County Railways for: ' + baninfo[2])
-                        except discord.errors.Forbidden:
-                            pass
-                        except AttributeError:
-                            pass
-                        await message.guild.ban(message.guild.get_member(int(baninfo[1])), reason=baninfo[2])
-                        mycursor.execute("INSERT INTO banlist (Banned, Banner, Reason) VALUES ('" + baninfo[1] + "', '" + str(message.author.id) + "', '" + baninfo[2] + "');")
-                        AltonDB.commit()
-                    except discord.errors.Forbidden:
-                        await message.channel.send('I do not have permissions to ban this user.')
-                    except IndexError:
-                        await message.channel.send('A reason is needed to kick.')
-                else:
-                    await message.channel.send('Sorry, you have to be an MOD+ to ban.')
-            elif messege.startswith('warnings'):
-                roles = []
-                msg = []
-                search = ''
-                if len(messege) > 9:
-                    search = " WHERE `Warned` = " + tagtoid(messege[9:], message)
-                for i in message.author.roles:
-                    roles.append(i.name)
-                if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
-                    AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
-                    mycursor = AltonDB.cursor(buffered=True)
-                    mycursor.execute("SELECT * FROM `warnlist`" + search + " ORDER BY `warnlist`.`Warned` ASC")
-                    warnings  = mycursor.fetchall()
-                    for row in warnings:
-                        try:
-                            try:
-                                warned = message.guild.get_member(int(row[1])).nick
-                                if warned == None:
-                                    raise AttributeError()
-                            except AttributeError:
-                                warned = await bot.get_user_info(int(row[1]))
-                                warned = warned.name
-                        except discord.errors.NotFound:
-                            warned = str(row[1])
-                        try:
-                            try:
-                                warner = message.guild.get_member(int(row[2])).nick
-                                if warner == None:
-                                    raise AttributeError()
-                            except AttributeError:
-                                warner = await bot.get_user_info(int(row[2]))
-                                warner = warner.name
-                        except discord.errors.NotFound:
-                            warner = str(row[2])
-                        msg.append('*' + warned + '* was warned by *' + warner + '* for reason: ' + row[3])
-                    try:
-                        await message.channel.send('\n'.join(msg))
-                    except discord.errors.HTTPException:
-                        await message.channel.send('This user has no warnings.')
-            elif messege.startswith('clearwarn'):
-                part = message.content.split(' ')
-                roles = []
-                for i in message.author.roles:
-                    roles.append(i.name)
-                if ('Executive Team' in roles) or ('Management Team' in roles) or ('High Rank Team' in roles):
-                    part[1] = tagtoid(part[1], message)
-                    AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
-                    mycursor = AltonDB.cursor(buffered=True)
-                    mycursor.execute("DELETE FROM `warnlist` WHERE `warned` = '" + part[1] + "'")
-                    noofwarns = mycursor.rowcount
-                    AltonDB.commit()
-                    try:
-                        nickname = message.guild.get_member(int(part[1])).nick
-                    except AttributeError:
-                        try:
-                            nickname = await bot.get_user_info(int(part[1]))
-                            nickname = nickname.name
-                        except discord.errors.NotFound:
-                            nickname = str(part[1])
-                    if nickname == None:
-                        nickname = await bot.get_user_info(int(part[1]))
-                        nickname = nickname.name
-                    await message.channel.send('Successfully cleared ' + str(noofwarns) + ' warnings for ' + nickname)
-                else:
-                    await message.channel.send('You have to be an SD+ to clear warnings.')
-            elif messege.lower().startswith('help moderation'):
-                HelpMsg = discord.Embed(title='Help Page', description='This is a page full of moderation commands you can use with AltonBot', color=3447003)
-                HelpMsg.set_author(name='Alton Bot', icon_url=bot.user.avatar_url)
-                HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'warn [user]', value='**SD+ Only** - warns a user')
-                HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'kick [user]', value='**SD+ Only** - kicks a user')
-                HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'ban [user]', value='**MOD+ Only** - bans a user indefinetely or until unbanned.')
-                HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'warnings [user(optional)]', value='Displays all warnings currently stored in memory or just for the user.')
-                HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'clearwarnings [user]', value='**SD+ Only** - clears the warnings of a certain player.')
-                HelpMsg.set_footer(icon_url=bot.user.avatar_url, text='© Alton County Railways')
-                await message.channel.send(embed=HelpMsg)
-            elif messege.lower().startswith('help training'):
-                HelpMsg = discord.Embed(title='Help Page', description='This is a page full of training commands you can use with AltonBot', color=3447003)
-                HelpMsg.set_author(name='Alton Bot', icon_url=bot.user.avatar_url)
-                HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'nexttrainings', value='Shows upcoming training sessions.')
-                HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'trainingreminder [id]', value='**SD+ Only** - Sends a training reminder about the specified training.')
-                HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'edittraining [id] [fieldtochange]: [valuetochangeto]', value='**SD+ Only** - edits training session specified **Currently in BETA**')
-                HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'canceltraining [id]', value='**SD+ Only** - deletes training session specified.')
-                HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'mytrainings [user(optional)]', value='**SD+ Only** - Displays user\'s or your hosted training sessions.')
-                HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'alltrainings', value='Displays all training sessions.')
-                HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'endtraining [id] [passeduser1] [passeduser2]...', value='**SD+ Only** Sends a message to training notices that training has ended and automatically promotes users specified. **COMING SOON**')
-                HelpMsg.set_footer(icon_url=bot.user.avatar_url, text='© Alton County Railways')
-                await message.channel.send(embed=HelpMsg)
-            elif messege.lower().startswith('help other'):
-                HelpMsg = discord.Embed(title='Help Page', description='This is a page full of other commands you can use with AltonBot', color=3447003)
-                HelpMsg.set_author(name='Alton Bot', icon_url=bot.user.avatar_url)
-                HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'help', value='Displays a help page.')
-                HelpMsg.add_field(name=(CMDPrefix.get(message.guild.id)) + 'prefix', value='Changes the prefix for commands')
-                HelpMsg.set_footer(icon_url=bot.user.avatar_url, text='© Alton County Railways')
-                await message.channel.send(embed=HelpMsg)
-            elif messege.startswith('help'):
-                HelpMsg = discord.Embed(title='Help Page', description='There are two types of commands you can use with AltonBot. \nPlease type ' + CMDPrefix.get(message.guild.id) + 'help [type] to see help for a certain type of command', color=3447003)
-                HelpMsg.set_author(name='Alton Bot', icon_url=bot.user.avatar_url)
-                HelpMsg.add_field(name='Moderation', value='This includes all the commands that warn, ban and kick users.')
-                HelpMsg.add_field(name='Trainings', value='This includes all the commands that the bot can do in regards to trainings')
-                HelpMsg.add_field(name='Other', value='This includes any other commands that AltonBot can do')
-                HelpMsg.set_footer(icon_url=bot.user.avatar_url, text='© Alton County Railways')
-                await message.channel.send(embed=HelpMsg)
-            elif messege.startswith('prefix'):
-                if len(messege) < 8:
-                    await message.channel.send('Your prefix has been set to the default(!) from ' + CMDPrefix.get(message.guild.id))
-                    CMDPrefix.update({
-                        message.guild.id: '!',
-                    })
-                    with open('ServerPrefixes.py', 'w') as f:
-                        f.write('CMDPrefix = {\n')
-                        for (key, val) in CMDPrefix.items():
-                            f.write(((("    '" + key) + "':'") + val) + "',\n")
-                        f.write('}\n')
-                elif len(messege) > 7:
-                    await message.channel.send((('You have changed your prefix from ' + CMDPrefix.get(message.guild.id)) + ' to ') + messege[7:])
-                    CMDPrefix.update({
-                        message.guild.id: messege[7:],
-                    })
-                    with open('ServerPrefixes.py', 'w') as f:
-                        f.write('CMDPrefix = {\n')
-                        for (key, val) in CMDPrefix.items():
-                            f.write(((("    '" + key) + "':'") + val) + "',\n")
-                        f.write('}\n')
-                await bot.change_presence(activity=discord.Game(name=(CMDPrefix.get(514155943525875716) if 514155943525875716 in CMDPrefix else '!') + 'help'))
-            elif messege.startswith('await'):
-                if message.author.id == 244596682531143680:
-                    await message.delete()
-                    await eval(messege[6:])
-                else:
-                    await message.channel.send('Sorry lucky962 is the only person who can run this command at this moment.')
-            elif messege.startswith('rawcommand'):
-                if message.author.id == 244596682531143680:
-                    exec(message[11:])
-                else:
-                    await message.channel.send('Sorry lucky962 is the only person who can run this command at this moment.')
-        elif message.content.startswith('?warn') or message.content.startswith('?kick') or message.content.startswith('?ban'):
-            await message.channel.send('Please use AltonBot for this operation.')
-    except:
-        await message.channel.send((traceback.format_exc().replace('leote','username')).split('\n')[-2])
+    if message.content.startswith('?warn') or message.content.startswith('?kick') or message.content.startswith('?ban'):
+        await message.channel.send('You should use AltonBot for this operation. ;)')
     await bot.process_commands(message)
          
 
@@ -713,7 +267,8 @@ async def on_reaction_add(reaction, user):
 
 initial_extensions = ['cogs.error_handler',
                       'cogs.training_commands',
-                      'cogs.moderation_commands']
+                      'cogs.moderation_commands',
+                      'cogs.other_commands']
 
 if __name__ == '__main__':
     for extension in initial_extensions:
@@ -722,9 +277,15 @@ if __name__ == '__main__':
         except Exception as e:
             traceback.print_exc()
 
-@bot.command()
-async def endtraining(ctx):
-    await ctx.send('Endtraining command coming soon! Keep your eyes peeled!')
+@bot.command(name='hello', hidden=True)
+async def do_canceltraining(ctx):
+    msg = 'Hello {0.author.mention}'.format(ctx)
+    await ctx.channel.send(msg)
+
+@commands.command(name='setprefix')
+@commands.has_any_role('Executive Team','Management Team','High Rank Team')
+async def do_setprefix(ctx):
+    ctx.send('Setprefix command under maintenance, will be back soon! :)')
 
 bot.loop.create_task(my_background_task())
 bot.run(TOKEN)
