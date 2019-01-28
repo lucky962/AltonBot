@@ -10,6 +10,14 @@ class ModerationCommands:
         hostip = bot.hostip
         tagtoid = bot.tagtoid
 
+    @commands.command(name='purge', description='**SD+ Only** - deletes number of messages specified', brief='deletes number of messages  specified')
+    @commands.has_any_role('Executive Team','Management Team','High Rank Team')
+    async def do_purge(self, ctx, noofmessages):
+        messages=[]
+        async for message in ctx.channel.history(limit=int(noofmessages) + 1):
+            messages.append(message)
+        await ctx.channel.delete_messages(messages)
+
     @commands.command(name='warn', description='**SD+ Only** - warns a user', brief='warns a user')
     @commands.has_any_role('Executive Team','Management Team','High Rank Team')
     async def do_warn(self, ctx, warned, *, reason):
@@ -49,7 +57,6 @@ class ModerationCommands:
                 AltonDB.commit()
             except discord.errors.Forbidden:
                 await ctx.send("Sorry, I don't have the permissions to ban that user.")
-
 
     @commands.command(name='kick', description='**SD+ Only** - kicks a user', brief='kicks a user')
     @commands.has_any_role('Executive Team','Management Team','High Rank Team')
@@ -97,6 +104,7 @@ class ModerationCommands:
     @commands.command(name='warnings', description='Displays all warnings currently stored in memory or just for the user.', brief='Displays all warnings currently stored in memory.')
     @commands.has_any_role('Executive Team','Management Team','High Rank Team')
     async def do_warnings(self, ctx, *tag):
+        await ctx.channel.trigger_typing()
         msg = []
         search = ''
         print(tag)
@@ -129,10 +137,16 @@ class ModerationCommands:
                     warner = warner.name
             except discord.errors.NotFound:
                 warner = str(row[2])
-            print('*' + warned + '* was warned by *' + warner + '* for reason: ' + row[3])
             msg.append('*' + warned + '* was warned by *' + warner + '* for reason: ' + row[3])
-        if len(msg) > 0:
-            await ctx.send('\n'.join(msg))
+        msg = '\n'.join(msg)
+        print(msg)
+        if len(msg) > 2000:
+            msg = [msg[i:i+2000] for i in range(0, len(msg), 2000)]
+            print(msg)
+            for i in msg:
+                await ctx.send(i)
+        elif len(msg) > 0:
+            await ctx.send(msg)
         else:
             await ctx.send('This user has no warnings.')
 
