@@ -10,6 +10,30 @@ class ModerationCommands:
         hostip = bot.hostip
         tagtoid = bot.tagtoid
 
+    @commands.command(name='membercount', description='Counts the amount of members in this server', brief='Counts the amount of members in this server')
+    async def do_membercount(self, ctx):
+        print(ctx.guild.members)
+        members = 0
+        onlinemembers = 0
+        humans = 0
+        bots = 0
+        for i in ctx.guild.members:
+            members += 1
+            print(i.status)
+            print(type(i.status))
+            if i.status != discord.Status('offline'):
+                onlinemembers += 1
+            if i.bot == True:
+                bots += 1
+            elif i.bot == False:
+                humans += 1
+        membercount=discord.Embed()
+        membercount.add_field(name='Members', value=members, inline=False)
+        membercount.add_field(name='Online', value=onlinemembers, inline=False)
+        membercount.add_field(name='Humans', value=humans, inline=False)
+        membercount.add_field(name='Bots', value=bots, inline=False)
+        await ctx.send(embed=membercount)
+
     @commands.command(name='purge', description='**SD+ Only** - deletes number of messages specified', brief='deletes number of messages  specified')
     @commands.has_any_role('Executive Team','Management Team','High Rank Team')
     async def do_purge(self, ctx, noofmessages):

@@ -5,7 +5,7 @@ class OtherCommands:
     def __init__(self,bot):
         self.bot = bot
     
-    @commands.command(name='await', description='**lucky962 only** does a raw await command', brief='**lucky962 only** does a raw await command')
+    @commands.command(name='await', description='**lucky962 only** does a raw await command', brief='**lucky962 only** does a raw await command', hidden=True)
     @commands.is_owner()
     async def do_setprefix(self, ctx, *, args):
         await ctx.message.delete()

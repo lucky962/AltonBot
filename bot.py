@@ -140,7 +140,7 @@ async def on_message(message):
     print(message.author)
     print(message.content)
     if message.content.startswith('?warn') or message.content.startswith('?kick') or message.content.startswith('?ban'):
-        await message.channel.send('You should use AltonBot for this operation. ;)')
+        await message.channel.send('You should use AltonBot for this operation. ;)', delete_after=10)
     await bot.process_commands(message)
          
 
