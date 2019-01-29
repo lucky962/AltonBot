@@ -2,7 +2,9 @@ import discord
 from discord.ext import commands
 import mysql.connector
 import datetime
+import json
 from dateutil.relativedelta import relativedelta
+from urllib.request import Request, urlopen
 
 class TrainingCommands:
     def __init__(self,bot):
@@ -273,8 +275,18 @@ class TrainingCommands:
             await ctx.send('Sorry, no info found. The syntax is -edittraining [id] [thing to change]: [value to change to]')
 
     @commands.command(name='endtraining', description='**SD+ Only** Sends a message to training notices that training has ended and automatically promotes users specified. **COMING SOON**', brief='**SD+ Only** Sends a message to training notices that training has ended and automatically promotes users specified. **COMING SOON**')
-    async def do_endtraining(self, ctx):
-        await ctx.send('Endtraining command coming soon! Keep your eyes peeled!')
+    async def do_endtraining(self, ctx, trainingid):
+        await ctx.send('Endtraining command coming soon! Keep your eyes peeled!')  
+        # AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
+        # mycursor = AltonDB.cursor(buffered=True)
+        # mycursor.execute("SELECT TrainingType from `trainingsessions` WHERE `trainingsessions`.`ID` = " + trainingid + ";")
+        # trainingtype = mycursor.fetchall()[0][0]
+        # if trainingtype == 'Intermediate Driver Training':
+        #     req = Request('https://verify.eryn.io/api/user/' + , headers={'User-Agent': 'Mozilla/5.0'})
+        #     webpage = urlopen(req).read()
+        #     webpage = json.loads(webpage.decode())
+        #     robloxid = webpage.get('robloxId')
+        # elif trainingtype == 'Platform Operator Training':
 
 def setup(bot):
     bot.add_cog(TrainingCommands(bot))
