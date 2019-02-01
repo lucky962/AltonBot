@@ -20,7 +20,7 @@ requestchannel = 528528451192356874
 guildid = 514155943525875716
 mycursor = AltonDB.cursor(buffered=True)
 os.chdir('Dependencies')
-bot = commands.Bot(command_prefix='-')
+bot = commands.Bot(command_prefix='!')
 bot.hostip = hostip
 bot.noticechannel = noticechannel
 bot.requestchannel = requestchannel
