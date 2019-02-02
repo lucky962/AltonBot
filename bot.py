@@ -228,14 +228,14 @@ async def on_reaction_add(reaction, user):
                         cohost = cohostz
                         print(cohost)
                 print(host)
-                try:
-                    additionalinfo = re.search('Info:(.*)\n', reaction.message.content).group(1).strip('*').strip(' ')
-                except:
-                    try:
-                        additionalinfo = re.search('Info:(.*)', reaction.message.content).group(1).strip('*').strip(' ')
-                    except:
-                        pass
-                print(additionalinfo)
+                # try:
+                #     additionalinfo = re.search('Info:(.*)\n', reaction.message.content).group(1).strip('*').strip(' ')
+                # except:
+                #     try:
+                #         additionalinfo = re.search('Info:(.*)', reaction.message.content).group(1).strip('*').strip(' ')
+                #     except:
+                #         pass
+                # print(additionalinfo)
                 date = datetime.datetime.strptime(str(date), '%d/%m/%Y').strftime('%d %B %Y')
                 date = str(date)
                 time = time + ' GMT'
