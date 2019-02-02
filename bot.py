@@ -108,7 +108,7 @@ async def my_background_task():
             currenttime = datetime.datetime.strptime(currenttime, '%Y-%m-%d %H:%M:%S.%f')
             diff = relativedelta(TrainingTime, currenttime)
             if ('Signal' in trainingtype) or ('SG' in trainingtype) or ('Control' in trainingtype) or ('CN' in trainingtype):
-                notifiedrank = 'PLATFORM OPERATORS'
+                notifiedrank = 'TRAINEE CONTROLLERS'
                 trainedrank = 'Controller **[CN]**'
             elif ('Dispatch' in trainingtype) or ('DS' in trainingtype) or ('Platform' in trainingtype) or ('PO' in trainingtype):
                 notifiedrank = 'INTERMEDIATE DRIVERS'
@@ -232,7 +232,9 @@ async def on_reaction_add(reaction, user):
                 date = str(date)
                 time = time + ' GMT'
                 print('tasdfad')
-                if ('Dispatch' in trainingtype) or ('DS' in trainingtype) or ('Platform' in trainingtype) or ('PO' in trainingtype):
+                if ('Signal' in trainingtype) or ('SG' in trainingtype) or ('Control' in trainingtype) or ('CN' in trainingtype):
+                    trainingtype = trainingtype
+                elif ('Dispatch' in trainingtype) or ('DS' in trainingtype) or ('Platform' in trainingtype) or ('PO' in trainingtype):
                     trainingtype = 'Platform Operator Training'
                     # notifiedrank = 'INTERMEDIATE DRIVERS'
                     # trainedrank = 'Platform Operator **[PO]**'

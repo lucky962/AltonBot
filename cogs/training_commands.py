@@ -194,7 +194,7 @@ class TrainingCommands:
                 currenttime = datetime.datetime.strptime(currenttime, '%Y-%m-%d %H:%M:%S.%f')
                 diff = relativedelta(TrainingTime, currenttime)
                 if ('Signal' in trainingtype) or ('SG' in trainingtype) or ('Control' in trainingtype) or ('CN' in trainingtype):
-                    notifiedrank = 'PLATFORM OPERATORS'
+                    notifiedrank = 'TRAINEE CONTROLLERS'
                     trainedrank = 'Controller **[CN]**'
                 elif ('Dispatch' in trainingtype) or ('DS' in trainingtype) or ('Platform' in trainingtype) or ('PO' in trainingtype):
                     notifiedrank = 'INTERMEDIATE DRIVERS'
@@ -233,6 +233,8 @@ class TrainingCommands:
                 newinfo = 'Platform Operator Training'
             elif ('Experience' in newinfo) or ('ED' in newinfo) or ('Intermediate' in newinfo) or ('ID' in newinfo):
                 newinfo = 'Intermediate Driver Training'
+            elif ('Signal' in newinfo) or ('SG' in newinfo) or ('Control' in newinfo) or ('CN' in newinfo):
+                newinfo = newinfo
             else:
                 await ctx.send('Training type not recognised. Error will most likely occur when posting a training notice.')
             mycursor.execute("UPDATE `trainingsessions` SET `TrainingType` = '" + newinfo + "' WHERE `trainingsessions`.`ID` = " + trainingid + ";")
