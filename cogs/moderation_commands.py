@@ -82,6 +82,28 @@ class ModerationCommands:
             except discord.errors.Forbidden:
                 await ctx.send("Sorry, I don't have the permissions to ban that user.")
 
+    @commands.command(name='mute')
+    @commands.has_any_role('Executive Team','Management Team','High Rank Team')
+    async def do_mute(self, ctx, tag):
+        tag = tagtoid(tag, ctx)
+        print(tag)
+        member = ctx.guild.get_member(int(tag))
+        print(member)
+        role = discord.utils.get(ctx.guild.roles, name='Muted')
+        await member.add_roles(role)
+        await ctx.send(str(member.nick) + ' was muted by ' + ctx.message.author.nick)
+
+    @commands.command(name='unmute')
+    @commands.has_any_role('Executive Team','Management Team','High Rank Team')
+    async def do_unmute(self, ctx, tag):
+        tag = tagtoid(tag, ctx)
+        print(tag)
+        member = ctx.guild.get_member(int(tag))
+        print(member)
+        role = discord.utils.get(ctx.guild.roles, name='Muted')
+        await member.remove_roles(role)
+        await ctx.send(str(member.nick) + ' was unmuted by ' + ctx.message.author.nick)
+
     @commands.command(name='kick', description='**SD+ Only** - kicks a user', brief='kicks a user')
     @commands.has_any_role('Executive Team','Management Team','High Rank Team')
     async def do_kick(self, ctx, tag, *, reason):

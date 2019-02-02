@@ -13,14 +13,14 @@ from discord.ext import commands
 print(CMDPrefix)
 with open('BotToken.txt') as f:
     TOKEN = f.read()
-hostip = 'localhost'
+hostip = '192.168.0.100'
 AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
 noticechannel = 520701561564037143
 requestchannel = 528528451192356874
 guildid = 514155943525875716
 mycursor = AltonDB.cursor(buffered=True)
 os.chdir('Dependencies')
-bot = commands.Bot(command_prefix='!')
+bot = commands.Bot(command_prefix='-')
 bot.hostip = hostip
 bot.noticechannel = noticechannel
 bot.requestchannel = requestchannel
@@ -42,8 +42,11 @@ def tagtoid(tag, message): # Changes discord tag to id
                 continue
             if tag.lower() in i.nick.lower():
                 member.append(i.id)
+                print('match nick')
             elif tag.lower() in i.name.lower():
                 member.append(i.id)
+                print('match name')
+        print(member)
         if len(member) == 0:
             return None
         else:
@@ -61,7 +64,7 @@ async def my_background_task():
             await bot.change_presence(activity=discord.Game(name='Alton County Railways'))
             gameplaying = 1
         elif gameplaying == 1:
-            await bot.change_presence(activity=discord.Game(name=('!' + 'help')))
+            await bot.change_presence(activity=discord.Game(name=('-' + 'help')))
             gameplaying = 0
         AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
         mycursor = AltonDB.cursor(buffered=True)
@@ -129,7 +132,7 @@ async def my_background_task():
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(activity=discord.Game(name=(CMDPrefix.get(514155943525875716) if 514155943525875716 in CMDPrefix else '!') + 'help'))
+    await bot.change_presence(activity=discord.Game(name=('-' + 'help')))
     print('Logged in as')
     print(bot.user.name)
     print(bot.user.id)

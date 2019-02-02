@@ -187,6 +187,8 @@ class TrainingCommands:
                         except AttributeError:
                             cohost = await self.bot.get_user_info(int(row[4]))
                             cohost = cohost.name
+                        except ValueError:
+                            cohost = str(row[4])
                     except discord.errors.NotFound:
                         cohost = str(row[4])
                 TrainingTime = datetime.datetime.strptime(formattedtime, '%Y-%m-%d %H:%M:%S')
