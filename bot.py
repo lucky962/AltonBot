@@ -61,7 +61,7 @@ async def my_background_task():
             await bot.change_presence(activity=discord.Game(name='Alton County Railways'))
             gameplaying = 1
         elif gameplaying == 1:
-            await bot.change_presence(activity=discord.Game(name=(CMDPrefix.get(514155943525875716) if 514155943525875716 in CMDPrefix else '!') + 'help'))
+            await bot.change_presence(activity=discord.Game(name=('!' + 'help')))
             gameplaying = 0
         AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
         mycursor = AltonDB.cursor(buffered=True)
@@ -228,6 +228,14 @@ async def on_reaction_add(reaction, user):
                         cohost = cohostz
                         print(cohost)
                 print(host)
+                try:
+                    additionalinfo = re.search('Info:(.*)\n', reaction.message.content).group(1).strip('*').strip(' ')
+                except:
+                    try:
+                        additionalinfo = re.search('Info:(.*)', reaction.message.content).group(1).strip('*').strip(' ')
+                    except:
+                        pass
+                print(additionalinfo)
                 date = datetime.datetime.strptime(str(date), '%d/%m/%Y').strftime('%d %B %Y')
                 date = str(date)
                 time = time + ' GMT'
