@@ -11,7 +11,7 @@ class OtherCommands:
         await ctx.message.delete()
         await eval(args)
 
-    @commands.command(name='echo', description='**lucky962 only** does a raw await command', brief='**lucky962 only** does a raw await command', hidden=True)
+    @commands.command(name='echo', description='**lucky962 only** does a raw await command', brief='**lucky962 only** does a raw await command', hidden=True, enabled=False)
     @commands.has_any_role('Executive Team','Management Team')
     async def do_echo   (self, ctx, *, args):
         await ctx.message.delete()
