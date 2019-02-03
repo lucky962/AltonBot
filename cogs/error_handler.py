@@ -24,6 +24,9 @@ class CommandErrorHandler:
 
         elif isinstance(error, commands.errors.CheckFailure):
             return await ctx.send('You don\'t have enough permissions to run this command')
+        
+        elif isinstance(error, commands.errors.DisabledCommand):
+            return await ctx.send('This command has been disabled, please dm lucky9621 if you think this has been an error.')
             
         print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
         traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
