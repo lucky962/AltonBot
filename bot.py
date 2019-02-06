@@ -283,15 +283,15 @@ async def on_reaction_add(reaction, user):
                 AltonDB.commit()
                 if trainingtype == 'Intermediate Driver Training':
                     new_event_dict = {'title': 'Intermediate Driver Training',
-                                    'start_dt': TrainingTime - datetime.timedelta(hours=2),
-                                    'end_dt': TrainingTime - datetime.timedelta(hours=2) + datetime.timedelta(minutes=30),
+                                    'start_dt': TrainingTime + datetime.timedelta(hours=10) ,
+                                    'end_dt': TrainingTime + datetime.timedelta(hours=10)  + datetime.timedelta(minutes=30),
                                     'subcalendar_ids': IDCal['id'],
                                     'who': reaction.message.guild.get_member(int(host)).nick}
                     new_event = calendar.new_event(**new_event_dict, returnas='event')
                 elif trainingtype == 'Platform Operator Training':
                     new_event_dict = {'title': 'Platform Operator Training',
-                                    'start_dt': TrainingTime - datetime.timedelta(hours=2),
-                                    'end_dt': TrainingTime - datetime.timedelta(hours=2) + datetime.timedelta(minutes=30),
+                                    'start_dt': TrainingTime + datetime.timedelta(hours=10) ,
+                                    'end_dt': TrainingTime + datetime.timedelta(hours=10) + datetime.timedelta(minutes=30),
                                     'subcalendar_ids': POCal['id'],
                                     'who': reaction.message.guild.get_member(int(host)).nick}
                     print(new_event_dict)

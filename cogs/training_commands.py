@@ -140,7 +140,14 @@ class TrainingCommands:
             except discord.errors.NotFound:
                 cohost = str(row[4])
             msg.append('**' + row[1] + '**' + row[2].strftime(' at **%I:%M %p** on **%d/%m/%Y**. Hosted by: **') + host + '** Co-hosted by: **' + (cohost if cohost != '' else 'None') + ('** [ID: ' + str(row[0]) + ']' if HR == True else ""))
-        await ctx.send('\n'.join(msg))
+        msg = '\n'.join(msg)
+        if len(msg) > 2000:
+            msg = [msg[i:i+2000] for i in range(0, len(msg), 2000)]
+            print(msg)
+            for i in msg:
+                await ctx.send(i)
+        elif len(msg) > 0:
+            await ctx.send(msg)
 
     @commands.command(name='canceltrainings', aliases=['canceltraining'], description='**SD+ Only** - deletes training session specified.', brief='deletes training session specified.')
     @commands.has_any_role('Executive Team','Management Team','High Rank Team')
