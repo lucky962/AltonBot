@@ -10,9 +10,21 @@ import traceback
 from dateutil.relativedelta import relativedelta
 from Dependencies.ServerPrefixes import *
 from discord.ext import commands
+from pyteamup import Calendar,Event
 print(CMDPrefix)
 with open('BotToken.txt') as f:
     TOKEN = f.read()
+with open('CalendarToken.txt') as f:
+    CALENDARTOKEN = f.read()
+    calendar = Calendar('ks12w8wutcgk67ke8e', CALENDARTOKEN)
+
+subcalendars = calendar.subcalendars
+IDCal = subcalendars[3]
+POCal = subcalendars[4]
+
+print(subcalendars[3])
+print(subcalendars[4])
+
 hostip = 'localhost'
 AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
 noticechannel = 520701561564037143
@@ -269,6 +281,22 @@ async def on_reaction_add(reaction, user):
                 mycursor = AltonDB.cursor(buffered=True)
                 mycursor.execute((((((((((('INSERT INTO trainingsessions (ID, TrainingType, TrainingTime, Host' + cohosttempz) + ") VALUES ('") + str(reaction.message.id)) + "', '") + trainingtype) + "', '") + str(TrainingTime)) + "', '") + host) + "'") + cohosttemp)
                 AltonDB.commit()
+                if trainingtype == 'Intermediate Driver Training':
+                    new_event_dict = {'title': 'Intermediate Driver Training',
+                                    'start_dt': TrainingTime - datetime.timedelta(hours=2),
+                                    'end_dt': TrainingTime - datetime.timedelta(hours=2) + datetime.timedelta(minutes=30),
+                                    'subcalendar_ids': IDCal['id'],
+                                    'who': reaction.message.guild.get_member(int(host)).nick}
+                    new_event = calendar.new_event(**new_event_dict, returnas='event')
+                elif trainingtype == 'Platform Operator Training':
+                    new_event_dict = {'title': 'Platform Operator Training',
+                                    'start_dt': TrainingTime - datetime.timedelta(hours=2),
+                                    'end_dt': TrainingTime - datetime.timedelta(hours=2) + datetime.timedelta(minutes=30),
+                                    'subcalendar_ids': POCal['id'],
+                                    'who': reaction.message.guild.get_member(int(host)).nick}
+                    print(new_event_dict)
+                    new_event = calendar.new_event(**new_event_dict, returnas='event')
+                print(new_event.event_id)
                 # await bot.get_channel(noticechannel).send((((((((((((((((((((('Attention **' + notifiedrank) + "**, just letting you know that there'll be a ") + trainedrank) + ' Training in **') + str(diff.days)) + ' days, ') + str(diff.hours)) + ' hours, ') + str(diff.minutes)) + ' minutes  / ') + time) + '!** (') + date) + ') \n\nHost: ') + host) + ((' \nCo-host: ' + cohost) + '\n' if cohost != None else '\n')) + '\nThe link will be posted on the __**Group Wall or Group Shout (One Of the two)**__ **10** minutes before its scheduled time. [**') + posttime) + '**].\n\nOnce you join, please spawn as a __**passenger**__ at __**Standen Station**__ and line up __**against the ticket machines!**__\n\nThanks for reading,\n**') + reaction.message.author.nick) + '**')
                 # await reaction.message.channel.send(('Thank you for hosting a Training session, please remember your id, ' + str(reaction.message.id)) + ', in order to run more commands for your training session in the future using AltonBot')
                 approvedby = await reaction.users().flatten()

@@ -220,7 +220,7 @@ class TrainingCommands:
     async def do_edittraining(self, ctx, trainingid, name, newinfo):
         AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
         mycursor = AltonDB.cursor(buffered=True)
-        await ctx.send('Edittraining command still in early development, there may be a few bugs!')
+        await ctx.send('Edittraining command still in early development, there may be a few bugs! (This will not edit the teamup event)')
         print(newinfo)
         if 'co-host' in name.lower() or 'cohost' in name.lower():
             mycursor.execute("UPDATE `trainingsessions` SET `Cohost` = '" + newinfo + "' WHERE `trainingsessions`.`ID` = " + trainingid + ";")
