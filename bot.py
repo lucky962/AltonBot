@@ -11,7 +11,7 @@ from dateutil.relativedelta import relativedelta
 from Dependencies.ServerPrefixes import *
 from discord.ext import commands
 from pyteamup import Calendar,Event
-print(CMDPrefix)
+# print(CMDPrefix)
 with open('BotToken.txt') as f:
     TOKEN = f.read()
 with open('CalendarToken.txt') as f:
@@ -22,10 +22,10 @@ subcalendars = calendar.subcalendars
 IDCal = subcalendars[3]
 POCal = subcalendars[4]
 
-print(subcalendars[3])
-print(subcalendars[4])
+# print(subcalendars[3])
+# print(subcalendars[4])
 
-hostip = 'localhost'
+hostip = '192.168.0.100'
 AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
 noticechannel = 520701561564037143
 requestchannel = 528528451192356874
@@ -43,22 +43,22 @@ def tagtoid(tag, message): # Changes discord tag to id
         return (str(isd))
     except ValueError:
         members = message.guild.members
-        print(members)
+        # print(members)
         member = []
         for i in members:
-            print(i)
+            # print(i)
             if i.nick == None:
                 if tag.lower() in i.name.lower():
                     member.append(i.id)
-                    print('no nickname matching name')
+                    # print('no nickname matching name')
                 continue
             if tag.lower() in i.nick.lower():
                 member.append(i.id)
-                print('match nick')
+                # print('match nick')
             elif tag.lower() in i.name.lower():
                 member.append(i.id)
-                print('match name')
-        print(member)
+                # print('match name')
+        # print(member)
         if len(member) == 0:
             return None
         else:
@@ -66,12 +66,13 @@ def tagtoid(tag, message): # Changes discord tag to id
 bot.tagtoid = tagtoid
 
 async def my_background_task():
-    print('automaticreminder task started')
+    # print('automaticreminder task started')
     await bot.wait_until_ready()
-    print('bot is ready')
+    # print('bot is ready')
     guild = bot.get_guild(guildid)
     gameplaying = 0
     while not bot.is_closed():
+        # print('Checking - ' + str(datetime.datetime.now()))
         if gameplaying == 0:
             await bot.change_presence(activity=discord.Game(name='Alton County Railways'))
             gameplaying = 1
@@ -83,9 +84,9 @@ async def my_background_task():
         mycursor.execute("SELECT * FROM `trainingsessions` WHERE `TrainingTime` > '" + str(datetime.datetime.now() - datetime.timedelta(hours=11)) + "' AND `TrainingTime` < '" + str(datetime.datetime.now() - datetime.timedelta(hours=10)) + "' AND `Reminded` = 0")
         trainingreminders = mycursor.fetchall()
         for row in trainingreminders:
-            print(row)
+            # print(row)
             trainingtype = row[1]
-            print(trainingtype)
+            # print(trainingtype)
             time = datetime.datetime.strptime(str(row[2])[11:16], '%H:%M')
             posttime = (time - datetime.timedelta(minutes=10)).strftime('%I:%M %p')
             time = str(time.strftime('%I:%M %p'))
@@ -131,6 +132,10 @@ async def my_background_task():
             elif ('Experience' in trainingtype) or ('ED' in trainingtype) or ('Intermediate' in trainingtype) or ('ID' in trainingtype):
                 notifiedrank = 'NOVICE DRIVERS'
                 trainedrank = 'Intermediate Driver **[ID]**'
+            elif ('high' in trainingtype.lower()):
+                trainingtype = trainingtype
+                notifiedrank = 'HIGH RANK TEAM'
+                trainedrank = 'High Rank Team'
             elif 'Dev' in trainingtype:
                 trainingtype = 'Developer Training'
                 notifiedrank = 'Trainee Developer'
@@ -139,7 +144,7 @@ async def my_background_task():
             await bot.get_channel(noticechannel).send('Attention **' + notifiedrank + "**, just a reminder that there'll be a " + trainedrank + ' Training in **' + str(diff.days) + ' days, ' + str(diff.hours) + ' hours, ' + str(diff.minutes) + ' minutes  / ' + time + '!** (' + date + ') \n\nHost: ' + host + ' \nCo-host: ' + ((cohost + '\n') if cohost != '' else '\n') + '\nThe link will be posted on the __**Group Wall or Group Shout (One Of the two)**__ **10** minutes before its scheduled time. [**' + posttime + '**].\n\nOnce you join, please spawn as a __**passenger**__ at __**Standen Station**__ and line up __**against the ticket machines!**__\n\nThanks for reading,\n**' + host + '**')
             mycursor.execute("UPDATE `trainingsessions` SET `Reminded` = '1' WHERE `trainingsessions`.`ID` = " + str(row[0]) + ";")
             AltonDB.commit()
-            print('done')
+            #print('done')
         await asyncio.sleep(10)
 
 @bot.event
@@ -149,15 +154,27 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
+    bot.loop.create_task(my_background_task())
 
 @bot.event
 async def on_message(message):
-    print(message.author)
+    print(f"Message by {message.author} in {message.channel} at {datetime.datetime.now()}")
     print(message.content)
     if message.content.startswith('?warn') or message.content.startswith('?kick') or message.content.startswith('?ban'):
         await message.channel.send('You should use AltonBot for this operation. ;)', delete_after=10)
     await bot.process_commands(message)
-         
+
+@bot.event
+async def on_message_delete(message):
+    print(f"Message by {message.author} in {message.channel} deleted at {datetime.datetime.now()} with content: ")
+    print(message.content)
+
+@bot.event
+async def on_message_edit(before, after):
+    print(f"Message by {before.author} in {before.channel} edited at {datetime.datetime.now()} from content: ")
+    print(before.content)
+    print('to: ')
+    print(after.content)
 
 @bot.event
 async def on_reaction_add(reaction, user):
@@ -172,7 +189,7 @@ async def on_reaction_add(reaction, user):
                         trainingtype = re.search('Type:(.*)', reaction.message.content).group(1).strip('*').strip(' ')
                     except:
                         await reaction.message.channel.send('Error finding Training Type')
-                print(trainingtype)
+                # print(trainingtype)
                 try:
                     time = re.search('Time:(.*)\n', reaction.message.content).group(1).strip('*').strip(' ')
                 except:
@@ -180,12 +197,12 @@ async def on_reaction_add(reaction, user):
                         time = re.search('Time:(.*)', reaction.message.content).group(1).strip('*').strip(' ')
                     except:
                         await reaction.message.channel.send('Error finding Time')
-                print(time)
+                # print(time)
                 if 'GMT' in time:
                     formattedtime = time = re.search('Time: (.*)GMT', reaction.message.content).group(1).strip()
                 else:
                     formattedtime = time = re.search('Time: (.*)', reaction.message.content).group(1).strip()
-                print(formattedtime)
+                # print(formattedtime)
                 try:
                     date = re.search('Date:(.*)\n', reaction.message.content).group(1).strip('*').strip(' ')
                 except:
@@ -193,6 +210,15 @@ async def on_reaction_add(reaction, user):
                         date = re.search('Date:(.*)', reaction.message.content).group(1).strip('*').strip(' ')
                     except:
                         await reaction.message.channel.send('Error finding Date')
+                # print(date)
+                date = date.split('/')
+                if len(date[0]) == 1:
+                    date[0] = '0' + date[0]
+                if len(date[1]) == 1:
+                    date[1] = '0' + date[1]
+                if len(date[2]) == 2:
+                    date[2] = '20' + date[2]
+                date = '/'.join(date)
                 print(date)
                 if ('pm' in formattedtime.lower()) or ('am' in formattedtime.lower()):
                     formattedtime = time = formattedtime.replace(' ', '')
@@ -225,7 +251,7 @@ async def on_reaction_add(reaction, user):
                         host = re.search('Host:(.*)', reaction.message.content).group(1).strip('*').strip(' ')
                     except:
                         await reaction.message.channel.send('Error finding Host')
-                print(host)
+                # print(host)
                 try:
                     cohost = re.search('Co-host:(.*)\n', reaction.message.content).group(1).strip('*').strip(' ')
                 except:
@@ -233,7 +259,7 @@ async def on_reaction_add(reaction, user):
                         cohost = re.search('Co-host:(.*)', reaction.message.content).group(1).strip('*').strip(' ')
                     except:
                         cohost == ''
-                print(cohost)
+                # print(cohost)
                 host = tagtoid(host, reaction.message)
                 if host == None:
                     await reaction.message.send("Host user not found.")
@@ -241,8 +267,8 @@ async def on_reaction_add(reaction, user):
                     cohostz = tagtoid(cohost, reaction.message)
                     if cohostz != None:
                         cohost = cohostz
-                        print(cohost)
-                print(host)
+                        # print(cohost)
+                # print(host)
                 # try:
                 #     additionalinfo = re.search('Info:(.*)\n', reaction.message.content).group(1).strip('*').strip(' ')
                 # except:
@@ -250,11 +276,11 @@ async def on_reaction_add(reaction, user):
                 #         additionalinfo = re.search('Info:(.*)', reaction.message.content).group(1).strip('*').strip(' ')
                 #     except:
                 #         pass
-                # print(additionalinfo)
+                # # print(additionalinfo)
                 date = datetime.datetime.strptime(str(date), '%d/%m/%Y').strftime('%d %B %Y')
                 date = str(date)
                 time = time + ' GMT'
-                print('tasdfad')
+                # print('tasdfad')
                 if ('Signal' in trainingtype) or ('SG' in trainingtype) or ('Control' in trainingtype) or ('CN' in trainingtype):
                     trainingtype = trainingtype
                 elif ('Dispatch' in trainingtype) or ('DS' in trainingtype) or ('Platform' in trainingtype) or ('PO' in trainingtype):
@@ -265,6 +291,8 @@ async def on_reaction_add(reaction, user):
                     trainingtype = 'Intermediate Driver Training'
                     # notifiedrank = 'NOVICE DRIVERS'
                     # trainedrank = 'Intermediate Driver **[ID]**'
+                elif ('high' in trainingtype.lower()):
+                    trainingtype = trainingtype
                 elif 'Dev' in trainingtype:
                     trainingtype = 'Developer Training'
                     # notifiedrank = 'Trainee Developer'
@@ -294,9 +322,9 @@ async def on_reaction_add(reaction, user):
                                     'end_dt': TrainingTime + datetime.timedelta(hours=10) + datetime.timedelta(minutes=30),
                                     'subcalendar_ids': POCal['id'],
                                     'who': reaction.message.guild.get_member(int(host)).nick}
-                    print(new_event_dict)
+                    # print(new_event_dict)
                     new_event = calendar.new_event(**new_event_dict, returnas='event')
-                print(new_event.event_id)
+                # print(new_event.event_id)
                 # await bot.get_channel(noticechannel).send((((((((((((((((((((('Attention **' + notifiedrank) + "**, just letting you know that there'll be a ") + trainedrank) + ' Training in **') + str(diff.days)) + ' days, ') + str(diff.hours)) + ' hours, ') + str(diff.minutes)) + ' minutes  / ') + time) + '!** (') + date) + ') \n\nHost: ') + host) + ((' \nCo-host: ' + cohost) + '\n' if cohost != None else '\n')) + '\nThe link will be posted on the __**Group Wall or Group Shout (One Of the two)**__ **10** minutes before its scheduled time. [**') + posttime) + '**].\n\nOnce you join, please spawn as a __**passenger**__ at __**Standen Station**__ and line up __**against the ticket machines!**__\n\nThanks for reading,\n**') + reaction.message.author.nick) + '**')
                 # await reaction.message.channel.send(('Thank you for hosting a Training session, please remember your id, ' + str(reaction.message.id)) + ', in order to run more commands for your training session in the future using AltonBot')
                 approvedby = await reaction.users().flatten()
@@ -328,5 +356,4 @@ async def do_canceltraining(ctx):
 async def do_setprefix(ctx):
     ctx.send('Setprefix command under maintenance, will be back soon! :)')
 
-bot.loop.create_task(my_background_task())
 bot.run(TOKEN)

@@ -3,6 +3,7 @@ from discord.ext import commands
 import mysql.connector
 import datetime
 import json
+import requests
 from dateutil.relativedelta import relativedelta
 from urllib.request import Request, urlopen
 
@@ -17,6 +18,48 @@ class TrainingCommands:
         noticechannel = bot.noticechannel
         global tagtoid
         tagtoid = bot.tagtoid
+
+    @commands.command(name='traininginfo', description='Shows information on specified training session.', brief='Shows information on training sessions')
+    async def do_traininginfo(self, ctx, trainingid):
+        AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
+        mycursor = AltonDB.cursor(buffered=True)
+        mycursor.execute("SELECT * FROM `trainingsessions` WHERE `ID` = " + trainingid + ";")
+        traininginfo = mycursor.fetchall()[0]
+        traininginfomsg = discord.Embed(title='Training Info', color=3447003)
+        traininginfomsg.add_field(name='ID:', value=traininginfo[0], inline=False)
+        traininginfomsg.add_field(name='Training Type:', value=traininginfo[1], inline=False)
+        time = traininginfo[2].strftime('%I:%M %p GMT')
+        date = traininginfo[2].strftime('%d/%m/%Y')
+        traininginfomsg.add_field(name='Time:', value=time, inline=False)
+        traininginfomsg.add_field(name='Date:', value=date, inline=True)
+        try:
+            try:
+                host = ctx.guild.get_member(int(traininginfo[3])).nick
+                if host == None:
+                    raise AttributeError()
+            except AttributeError:
+                host = await self.bot.get_user_info(int(traininginfo[3]))
+                host = host.name
+        except discord.errors.NotFound:
+            host = str(traininginfo[3])
+        cohost = ''
+        if traininginfo[4] != '':
+            try:
+                try:
+                    cohost = ctx.guild.get_member(int(traininginfo[4])).nick
+                    if cohost == None:
+                        raise AttributeError()
+                except AttributeError:
+                    cohost = await self.bot.get_user_info(int(traininginfo[4]))
+                    cohost = cohost.name
+                except ValueError:
+                    cohost = str(traininginfo[4])
+            except discord.errors.NotFound:
+                cohost = str(traininginfo[4])
+        traininginfomsg.add_field(name='Host:', value=host, inline=False)
+        traininginfomsg.add_field(name='Co-host:', value=(cohost if len(cohost) > 0 else '\a'), inline=True)            
+        traininginfomsg.set_footer(icon_url=self.bot.user.avatar_url, text='© Alton County Railways')
+        await ctx.send(embed=traininginfomsg)
 
     @commands.command(name='nexttraining', aliases=['nexttrainings'], description='Shows upcoming training sessions.', brief='Shows upcoming training sessions.')
     async def do_nexttraining(self, ctx):
@@ -211,6 +254,10 @@ class TrainingCommands:
                 elif ('Experience' in trainingtype) or ('ED' in trainingtype) or ('Intermediate' in trainingtype) or ('ID' in trainingtype):
                     notifiedrank = 'NOVICE DRIVERS'
                     trainedrank = 'Intermediate Driver **[ID]**'
+                elif ('high' in trainingtype.lower()):
+                    trainingtype = trainingtype
+                    notifiedrank = 'HIGH RANK TEAM'
+                    trainedrank = 'High Rank Team'
                 elif 'Dev' in trainingtype:
                     trainingtype = 'Developer Training'
                     notifiedrank = 'Trainee Developer'
@@ -286,18 +333,30 @@ class TrainingCommands:
             await ctx.send('Sorry, no info found. The syntax is -edittraining [id] [thing to change]: [value to change to]')
 
     @commands.command(name='endtraining', description='**SD+ Only** Sends a message to training notices that training has ended and automatically promotes users specified. **COMING SOON**', brief='**SD+ Only** Sends a message to training notices that training has ended and automatically promotes users specified. **COMING SOON**')
-    async def do_endtraining(self, ctx, trainingid):
-        await ctx.send('Endtraining command coming soon! Keep your eyes peeled!')  
-        # AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
-        # mycursor = AltonDB.cursor(buffered=True)
-        # mycursor.execute("SELECT TrainingType from `trainingsessions` WHERE `trainingsessions`.`ID` = " + trainingid + ";")
-        # trainingtype = mycursor.fetchall()[0][0]
-        # if trainingtype == 'Intermediate Driver Training':
-        #     req = Request('https://verify.eryn.io/api/user/' + , headers={'User-Agent': 'Mozilla/5.0'})
-        #     webpage = urlopen(req).read()
-        #     webpage = json.loads(webpage.decode())
-        #     robloxid = webpage.get('robloxId')
-        # elif trainingtype == 'Platform Operator Training':
+    @commands.has_any_role('Executive Team','Management Team','High Rank Team')
+    async def do_endtraining(self, ctx, trainingid, *users):
+        await ctx.send('Endtraining command currently in BETA! Some things may not work as planned!')
+        robloxids = [] 
+        AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
+        mycursor = AltonDB.cursor(buffered=True)
+        mycursor.execute("SELECT TrainingType from `trainingsessions` WHERE `trainingsessions`.`ID` = " + trainingid + ";")
+        trainingtype = mycursor.fetchall()[0][0]
+        for passer in users:
+            passer = tagtoid(passer, ctx)
+            req = Request('https://verify.eryn.io/api/user/' + passer, headers={'User-Agent': 'Mozilla/5.0'})
+            webpage = urlopen(req).read()
+            webpage = json.loads(webpage.decode())
+            robloxids.append(webpage.get('robloxId'))
+            await ctx.send(f"robloxid: {webpage.get('robloxId')}", delete_after=10)
+        if trainingtype == 'Intermediate Driver Training':
+            for robloxid in robloxids:
+                r = requests.post(f"http://localhost:8080/setRank/4617915/{robloxid}/2", data={'key': 'hunter2'})
+                await ctx.send(str(r.status_code) + ' ' + r.reason, delete_after=10)
+        elif trainingtype == 'Platform Operator Training':
+            for robloxid in robloxids:
+                r = requests.post(f"http://localhost:8080/setRank/4617915/{robloxid}/3", data={'key': 'hunter2'})
+                await ctx.send(str(r.status_code) + ' ' + r.reason, delete_after=10)
+        await ctx.send('Successfully ended training and promoted users')
 
 def setup(bot):
     bot.add_cog(TrainingCommands(bot))

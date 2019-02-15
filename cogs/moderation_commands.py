@@ -37,10 +37,7 @@ class ModerationCommands:
     @commands.command(name='purge', description='**SD+ Only** - deletes number of messages specified', brief='deletes number of messages  specified')
     @commands.has_any_role('Executive Team','Management Team','High Rank Team')
     async def do_purge(self, ctx, noofmessages):
-        messages=[]
-        async for message in ctx.channel.history(limit=int(noofmessages) + 1):
-            messages.append(message)
-        await ctx.channel.delete_messages(messages)
+        await ctx.channel.purge(limit=int(noofmessages) + 1)
 
     @commands.command(name='warn', description='**SD+ Only** - warns a user', brief='warns a user')
     @commands.has_any_role('Executive Team','Management Team','High Rank Team')
@@ -194,10 +191,21 @@ class ModerationCommands:
         elif len(msg) > 0:
             await ctx.send(msg)
         else:
-            await ctx.send('This user has no warnings.')
+            tag = tagtoid(tag[0], ctx)
+            try:
+                try:
+                    user = ctx.guild.get_member(int(tag)).nick
+                    if user == None:
+                        raise AttributeError()
+                except AttributeError:
+                    user = await self.bot.get_user_info(int(tag))
+                    user = user.name
+            except discord.errors.NotFound:
+                user = str(tag)
+            await ctx.send(user + ' has no warnings.')
 
     @commands.command(name='clearwarnings', aliases=['clearwarn','clearwarning','clearwarns'], description='**SD+ Only** - clears the warnings of a certain player.', brief='clears the warnings of a certain player.')
-    @commands.has_any_role('Executive Team','Management Team','High Rank Team')
+    @commands.has_any_role('Executive Team','Management Team')
     async def do_clearwarnings(self, ctx, tag):
         tag = tagtoid(tag, ctx)
         AltonDB = mysql.connector.connect(host=hostip, user='root', passwd='Password', database='AltonBot')
